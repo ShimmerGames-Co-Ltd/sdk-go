@@ -1,0 +1,16 @@
+.idea
+.DS_Store
+config
+*.log
+.bin
+bin
+go.sum
+go.work
+go.work.sum
+setting/*.yml
+!setting/dev.yml
+!setting/default.yml
+!setting/prod.yml
+!setting/sandbox.yml
+vendor
+.vscode
