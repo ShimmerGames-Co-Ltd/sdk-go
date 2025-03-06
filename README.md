@@ -7,6 +7,9 @@
 2. HTTP 客户端支持, 请求签名
 
 ## 开始
+```shell
+go get -u github.com/ShimmerGames-Co-Ltd/sdk-go
+```
 
 ### 创建请求实例
 ```go

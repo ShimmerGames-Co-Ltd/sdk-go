@@ -4,8 +4,8 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
-	"github.com/shimmergames/sdk-go/core/auth"
-	"github.com/shimmergames/sdk-go/utils/sign"
+	"github.com/ShimmerGames-Co-Ltd/sdk-go/core/auth"
+	"github.com/ShimmerGames-Co-Ltd/sdk-go/utils/sign"
 	"net/url"
 )
 

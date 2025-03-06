@@ -2,9 +2,9 @@ package credential
 
 import (
 	"fmt"
-	"github.com/shimmergames/sdk-go/core/auth"
-	"github.com/shimmergames/sdk-go/core/consts"
-	"github.com/shimmergames/sdk-go/utils"
+	"github.com/ShimmerGames-Co-Ltd/sdk-go/core/auth"
+	"github.com/ShimmerGames-Co-Ltd/sdk-go/core/consts"
+	"github.com/ShimmerGames-Co-Ltd/sdk-go/utils"
 	"time"
 )
 

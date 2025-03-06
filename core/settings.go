@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/shimmergames/sdk-go/core/auth"
+	"github.com/ShimmerGames-Co-Ltd/sdk-go/core/auth"
 	"net/http"
 )
 

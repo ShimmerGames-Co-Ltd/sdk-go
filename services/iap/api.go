@@ -2,8 +2,8 @@ package iap
 
 import (
 	"context"
-	"github.com/shimmergames/sdk-go/core"
-	"github.com/shimmergames/sdk-go/services"
+	"github.com/ShimmerGames-Co-Ltd/sdk-go/core"
+	"github.com/ShimmerGames-Co-Ltd/sdk-go/services"
 )
 
 const (

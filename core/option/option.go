@@ -1,9 +1,9 @@
 package option
 
 import (
-	"github.com/shimmergames/sdk-go/core"
-	"github.com/shimmergames/sdk-go/core/auth/sign"
-	"github.com/shimmergames/sdk-go/core/consts"
+	"github.com/ShimmerGames-Co-Ltd/sdk-go/core"
+	"github.com/ShimmerGames-Co-Ltd/sdk-go/core/auth/sign"
+	"github.com/ShimmerGames-Co-Ltd/sdk-go/core/consts"
 	"net/http"
 )
 
