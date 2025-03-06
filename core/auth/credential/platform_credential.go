@@ -2,9 +2,9 @@ package credential
 
 import (
 	"fmt"
-	"gitlab.shimmer.lab/platform/sdk-go/core/auth"
-	"gitlab.shimmer.lab/platform/sdk-go/core/consts"
-	"gitlab.shimmer.lab/platform/sdk-go/utils"
+	"github.com/shimmergames/sdk-go/core/auth"
+	"github.com/shimmergames/sdk-go/core/consts"
+	"github.com/shimmergames/sdk-go/utils"
 	"time"
 )
 

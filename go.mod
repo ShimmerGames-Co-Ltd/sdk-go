@@ -1,4 +1,4 @@
-module gitlab.shimmer.lab/platform/sdk-go
+module github.com/shimmergames/sdk-go
 
 go 1.22.4
 

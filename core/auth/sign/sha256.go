@@ -4,8 +4,8 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
-	"gitlab.shimmer.lab/platform/sdk-go/core/auth"
-	"gitlab.shimmer.lab/platform/sdk-go/utils/sign"
+	"github.com/shimmergames/sdk-go/core/auth"
+	"github.com/shimmergames/sdk-go/utils/sign"
 	"net/url"
 )
 

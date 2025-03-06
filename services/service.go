@@ -1,6 +1,6 @@
 package services
 
-import "gitlab.shimmer.lab/platform/sdk-go/core"
+import "github.com/shimmergames/sdk-go/core"
 
 type Service struct {
 	Client *core.Client

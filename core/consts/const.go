@@ -24,8 +24,8 @@ const (
 	HeaderContentType                = "Content-Type"
 	HeaderContentTypeApplicationJSON = "application/json"
 
-	HeaderServiceSDKVersion      = "X-ServiceSDK-Version"
-	HeaderServiceSDKVersionValue = "1.0.0"
+	HeaderServiceSDKVersion      = "X-Version"
+	HeaderServiceSDKVersionValue = "1.1.0"
 
 	HeaderUserAgent       = "User-Agent"
 	HeaderUserAgentFormat = "ShimmerSDK-Go %s %s"

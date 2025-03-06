@@ -3,8 +3,8 @@ package authorization
 import (
 	"context"
 	"fmt"
-	"gitlab.shimmer.lab/platform/sdk-go/core"
-	"gitlab.shimmer.lab/platform/sdk-go/services"
+	"github.com/shimmergames/sdk-go/core"
+	"github.com/shimmergames/sdk-go/services"
 	"time"
 )
 
