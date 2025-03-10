@@ -19,7 +19,7 @@ type (
 	UserAuthorizeResponse struct {
 		UserId         int64  `json:"user_id"`
 		RoleId         int64  `json:"role_id"`
-		ShortId        int32  `json:"short_id"`
+		ShortId        int32  `json:"open_id"` // Alias: 平台OpenID 等同于 角色短ID
 		DispatchServer string `json:"dispatch_server"`
 	}
 )
