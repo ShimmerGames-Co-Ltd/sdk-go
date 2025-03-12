@@ -8,7 +8,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
-	"slices"
+	"sort"
 	"strings"
 )
 
@@ -140,7 +140,8 @@ func newOptions(opts ...SignOption) *option {
 	return sg
 }
 
-func isNull(value any) bool {
+// isNull 判断值是否为空
+func isNull(value interface{}) bool {
 	if value == nil {
 		return true
 	}
@@ -155,7 +156,24 @@ func isNull(value any) bool {
 	return false
 }
 
-func Generate(params map[string]any, opts ...SignOption) (string, error) {
+func ReverseStrings(arr []string) {
+	n := len(arr)
+	for i := 0; i < n/2; i++ {
+		arr[i], arr[n-1-i] = arr[n-1-i], arr[i]
+	}
+}
+
+func Contains(arr []string, target string) bool {
+	for _, v := range arr {
+		if v == target {
+			return true
+		}
+	}
+	return false
+}
+
+// Generate 生成签名
+func Generate(params map[string]interface{}, opts ...SignOption) (string, error) {
 	sg := newOptions(opts...)
 	keys := []string{}
 	for k := range params {
@@ -163,14 +181,21 @@ func Generate(params map[string]any, opts ...SignOption) (string, error) {
 	}
 
 	if sg.SortKeys == ASC {
-		slices.Sort(keys)
+		sort.Strings(keys)
 	} else if sg.SortKeys == DESC {
-		slices.Reverse(keys)
+		ReverseStrings(keys)
 	}
+
+	// 为保证兼容性, 取消 go 1.21 下slices包的使用
+	// if sg.SortKeys == ASC {
+	//	 slices.Sort(keys)
+	// } else if sg.SortKeys == DESC {
+	//	 slices.Reverse(keys)
+	// }
 
 	ss := []string{}
 	for _, k := range keys {
-		if slices.Contains(sg.SkipKeys, k) {
+		if Contains(sg.SkipKeys, k) {
 			continue
 		}
 		value := params[k]
