@@ -21,7 +21,7 @@ go get -u github.com/ShimmerGames-Co-Ltd/sdk-go
         // 选择全球平台地址
         // option.WithRegion(option.RegionGlobal),
 	// 自定义平台地址
-        // option.WithURL("https://example.platform.com"), 
+        // option.WithUrl("https://example.platform.com"), 
         // 服务侧验证信息
         option.WithAuthCipher("YOUR_ORGANIZATIONID", "YOUR_APPID", "APP_SECRET"),
 	}
