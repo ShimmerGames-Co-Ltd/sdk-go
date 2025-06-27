@@ -242,7 +242,13 @@ type (
 )
 
 type Type int32
-type Status int32
+
+type Status struct {
+	// 已读UTC时间戳，<=0表示未读
+	ReadAt int64 `json:"readAt"`
+	// 已领UTC时间戳，<=0表示未领取
+	ClaimAt int64 `json:"claimAt"`
+}
 
 // Attachment 附件信息
 type Attachment struct {
