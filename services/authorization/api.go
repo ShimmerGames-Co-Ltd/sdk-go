@@ -18,7 +18,7 @@ type AuthUserService services.Service
 // 根据 账号服务 下发的 `Token`, 进行用户合法性验证, 并返回用户的 `OpenId` 与其他相关数据
 func (svc *AuthUserService) UserAuthorize(ctx context.Context, req UserAuthorizeRequest) (resp *UserAuthorizeResponse, result *core.APIResult, err error) {
 
-	path := ApiPath + "server/verify_user"
+	path := ApiPath + "server/verify"
 
 	now := time.Now().Unix()
 

@@ -19,19 +19,19 @@ const (
 	DESC
 )
 
-type SignAlg int
+type Alg int
 
 const (
-	Empty SignAlg = iota
+	Empty Alg = iota
 	Md5
 	HmacSha1WithBase64
 	HmacSha256
 )
 
-var SignAlgFuncMap map[SignAlg]func(content, secret string, opt *option) string
+var AlgFuncMap map[Alg]func(content, secret string, opt *option) string
 
 func init() {
-	SignAlgFuncMap = map[SignAlg]func(content, secret string, opt *option) string{
+	AlgFuncMap = map[Alg]func(content, secret string, opt *option) string{
 		Empty:              signEmpty,
 		HmacSha1WithBase64: signHmacSha1WithBase64,
 		HmacSha256:         signHmacSha256,
@@ -67,7 +67,7 @@ type option struct {
 	SkipNullValue bool
 	UseKv         bool
 	SortKeys      SortType
-	SignAlg       SignAlg
+	SignAlg       Alg
 	Secret        string
 	NullStr       string
 	UseNullStr    bool
@@ -111,7 +111,7 @@ func WithSortKeys(sortKeys SortType) SignOption {
 	}
 }
 
-func WithSignAlg(signAlg SignAlg) SignOption {
+func WithSignAlg(signAlg Alg) SignOption {
 	return func(sg *option) {
 		sg.SignAlg = signAlg
 	}
@@ -219,7 +219,7 @@ func Generate(params map[string]interface{}, opts ...SignOption) (string, error)
 		}
 	}
 	content := strings.Join(ss, sg.Joiner)
-	if f, exist := SignAlgFuncMap[sg.SignAlg]; !exist {
+	if f, exist := AlgFuncMap[sg.SignAlg]; !exist {
 		return "", fmt.Errorf("sign alg %v not exist", sg.SignAlg)
 	} else {
 		return f(content, sg.Secret, sg), nil

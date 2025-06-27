@@ -24,8 +24,8 @@ const (
 	HeaderContentType                = "Content-Type"
 	HeaderContentTypeApplicationJSON = "application/json"
 
-	HeaderServiceSDKVersion      = "X-Version"
-	HeaderServiceSDKVersionValue = "1.1.0"
+	HeaderServiceSDKVersion      = "X-Server-Version"
+	HeaderServiceSDKVersionValue = "v1.0.0"
 
 	HeaderUserAgent       = "User-Agent"
 	HeaderUserAgentFormat = "ShimmerSDK-Go %s %s"
@@ -33,8 +33,8 @@ const (
 	HeaderAuthorization      = "Authorization"
 	HeaderAuthorizationValue = "organization_id=\"%s\",appid=\"%s\",nonce=\"%s\",timestamp=\"%d\",signature=\"%s\""
 
-	HeaderAppId          = "X-AppId"
-	HeaderOrganizationId = "X-OrganizationId"
+	HeaderAppId          = "X-App-Id"
+	HeaderOrganizationId = "X-Organization-Id"
 )
 
 const (

@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	ApiPath = "/open/"
+	ApiPath = "/iap/"
 )
 
 type PaymentService services.Service
@@ -16,7 +16,7 @@ type PaymentService services.Service
 // 向 支付服务 请求订单状态, 返回订单对应商品与状态
 func (svc *PaymentService) VerifyPayment(ctx context.Context, req VerifyPaymentRequest) (resp *VerifyPaymentResponse, result *core.APIResult, err error) {
 
-	path := ApiPath + "iap/server/verify_order"
+	path := ApiPath + "server/verify"
 
 	result, err = svc.Client.RequestPost(ctx, path, nil, req)
 	if err != nil {
