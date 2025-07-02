@@ -14,7 +14,7 @@ type Service services.Service
 
 // Register 注册排行榜
 func (svc *Service) Register(ctx context.Context, req RegisterRequest) (resp *RegisterReply, result *core.APIResult, err error) {
-	path := ApiPath + "leaderboard/register"
+	path := ApiPath + "register"
 	result, err = svc.Client.RequestPost(ctx, path, nil, req)
 	if err != nil {
 		return
@@ -26,7 +26,7 @@ func (svc *Service) Register(ctx context.Context, req RegisterRequest) (resp *Re
 
 // Delete 删除排行榜
 func (svc *Service) Delete(ctx context.Context, req DeleteRequest) (resp *DeleteReply, result *core.APIResult, err error) {
-	path := ApiPath + "leaderboard/delete"
+	path := ApiPath + "delete"
 	result, err = svc.Client.RequestPost(ctx, path, nil, req)
 	if err != nil {
 		return
@@ -38,7 +38,7 @@ func (svc *Service) Delete(ctx context.Context, req DeleteRequest) (resp *Delete
 
 // DeleteApp 清空 APP 全部排行榜
 func (svc *Service) DeleteApp(ctx context.Context, req DeleteAppRequest) (resp *DeleteAppReply, result *core.APIResult, err error) {
-	path := ApiPath + "leaderboard/app/delete"
+	path := ApiPath + "app/delete"
 	result, err = svc.Client.RequestPost(ctx, path, nil, req)
 	if err != nil {
 		return
@@ -50,7 +50,7 @@ func (svc *Service) DeleteApp(ctx context.Context, req DeleteAppRequest) (resp *
 
 // AllOfAPP 获取 APP 全部排行榜
 func (svc *Service) AllOfAPP(ctx context.Context, req AllOfAPPRequest) (resp *AllOfAPPReply, result *core.APIResult, err error) {
-	path := ApiPath + "leaderboard/app/all"
+	path := ApiPath + "app/all"
 	result, err = svc.Client.RequestPost(ctx, path, nil, req)
 	if err != nil {
 		return
@@ -62,7 +62,7 @@ func (svc *Service) AllOfAPP(ctx context.Context, req AllOfAPPRequest) (resp *Al
 
 // Ask 查询排行榜状态
 func (svc *Service) Ask(ctx context.Context, req AskRequest) (resp *AskReply, result *core.APIResult, err error) {
-	path := ApiPath + "leaderboard/ask"
+	path := ApiPath + "ask"
 	result, err = svc.Client.RequestPost(ctx, path, nil, req)
 	if err != nil {
 		return
@@ -74,7 +74,7 @@ func (svc *Service) Ask(ctx context.Context, req AskRequest) (resp *AskReply, re
 
 // SetScore 玩家设定绝对分
 func (svc *Service) SetScore(ctx context.Context, req SetScoreRequest) (resp *SetScoreReply, result *core.APIResult, err error) {
-	path := ApiPath + "leaderboard/score/set"
+	path := ApiPath + "score/set"
 	result, err = svc.Client.RequestPost(ctx, path, nil, req)
 	if err != nil {
 		return
@@ -86,7 +86,7 @@ func (svc *Service) SetScore(ctx context.Context, req SetScoreRequest) (resp *Se
 
 // IncrScore 玩家增量分
 func (svc *Service) IncrScore(ctx context.Context, req IncrScoreRequest) (resp *IncrScoreReply, result *core.APIResult, err error) {
-	path := ApiPath + "leaderboard/score/incr"
+	path := ApiPath + "score/incr"
 	result, err = svc.Client.RequestPost(ctx, path, nil, req)
 	if err != nil {
 		return
@@ -98,7 +98,7 @@ func (svc *Service) IncrScore(ctx context.Context, req IncrScoreRequest) (resp *
 
 // GetScore 获取玩家当前分
 func (svc *Service) GetScore(ctx context.Context, req GetScoreRequest) (resp *GetScoreReply, result *core.APIResult, err error) {
-	path := ApiPath + "leaderboard/score/get"
+	path := ApiPath + "score/get"
 	result, err = svc.Client.RequestPost(ctx, path, nil, req)
 	if err != nil {
 		return
@@ -110,7 +110,7 @@ func (svc *Service) GetScore(ctx context.Context, req GetScoreRequest) (resp *Ge
 
 // List 分页拉取排行榜
 func (svc *Service) List(ctx context.Context, req ListRequest) (resp *ListReply, result *core.APIResult, err error) {
-	path := ApiPath + "leaderboard/list"
+	path := ApiPath + "list"
 	result, err = svc.Client.RequestPost(ctx, path, nil, req)
 	if err != nil {
 		return
@@ -122,7 +122,7 @@ func (svc *Service) List(ctx context.Context, req ListRequest) (resp *ListReply,
 
 // BanAdd 封禁玩家
 func (svc *Service) BanAdd(ctx context.Context, req BanAddRequest) (resp *BanAddReply, result *core.APIResult, err error) {
-	path := ApiPath + "leaderboard/ban/add"
+	path := ApiPath + "ban/add"
 	result, err = svc.Client.RequestPost(ctx, path, nil, req)
 	if err != nil {
 		return
@@ -134,7 +134,7 @@ func (svc *Service) BanAdd(ctx context.Context, req BanAddRequest) (resp *BanAdd
 
 // BanRemove 解除封禁
 func (svc *Service) BanRemove(ctx context.Context, req BanRemoveRequest) (resp *BanRemoveReply, result *core.APIResult, err error) {
-	path := ApiPath + "leaderboard/ban/remove"
+	path := ApiPath + "ban/remove"
 	result, err = svc.Client.RequestPost(ctx, path, nil, req)
 	if err != nil {
 		return
@@ -146,7 +146,7 @@ func (svc *Service) BanRemove(ctx context.Context, req BanRemoveRequest) (resp *
 
 // BanClean 清空 APP 全部封禁
 func (svc *Service) BanClean(ctx context.Context, req BanCleanRequest) (resp *BanCleanReply, result *core.APIResult, err error) {
-	path := ApiPath + "leaderboard/ban/clean"
+	path := ApiPath + "ban/clean"
 	result, err = svc.Client.RequestPost(ctx, path, nil, req)
 	if err != nil {
 		return
@@ -158,7 +158,7 @@ func (svc *Service) BanClean(ctx context.Context, req BanCleanRequest) (resp *Ba
 
 // BanGet 获取封禁详情
 func (svc *Service) BanGet(ctx context.Context, req BanGetRequest) (resp *BanGetReply, result *core.APIResult, err error) {
-	path := ApiPath + "leaderboard/ban/get"
+	path := ApiPath + "ban/get"
 	result, err = svc.Client.RequestPost(ctx, path, nil, req)
 	if err != nil {
 		return
@@ -170,7 +170,7 @@ func (svc *Service) BanGet(ctx context.Context, req BanGetRequest) (resp *BanGet
 
 // BanList 分页拉取封禁列表
 func (svc *Service) BanList(ctx context.Context, req BanListRequest) (resp *BanListReply, result *core.APIResult, err error) {
-	path := ApiPath + "leaderboard/ban/list"
+	path := ApiPath + "ban/list"
 	result, err = svc.Client.RequestPost(ctx, path, nil, req)
 	if err != nil {
 		return
@@ -182,7 +182,7 @@ func (svc *Service) BanList(ctx context.Context, req BanListRequest) (resp *BanL
 
 // MemberInfo 查询玩家当日上报次数
 func (svc *Service) MemberInfo(ctx context.Context, req MemberInfoRequest) (resp *MemberInfoReply, result *core.APIResult, err error) {
-	path := ApiPath + "leaderboard/member/info"
+	path := ApiPath + "member/info"
 	result, err = svc.Client.RequestPost(ctx, path, nil, req)
 	if err != nil {
 		return
