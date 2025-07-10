@@ -1,6 +1,19 @@
 package iap
 
+type OrderExternalState int32
+
+const (
+	OrderExternalStatePending       OrderExternalState = 1
+	OrderExternalStatePayFailed     OrderExternalState = 2
+	OrderExternalStatePaySuccess    OrderExternalState = 3
+	OrderExternalStateVerifyFailed  OrderExternalState = 4
+	OrderExternalStateVerifyPending OrderExternalState = 5
+	OrderExternalStateVerifySuccess OrderExternalState = 6
+	OrderExternalStateDone          OrderExternalState = 7
+)
+
 type (
+
 	// VerifyPaymentRequest
 	// OrderId 平台订单ID
 	// Extras 平台透传信息(可选)
@@ -12,12 +25,14 @@ type (
 	// VerifyPaymentResponse
 	// OrderId 平台订单ID
 	// ProductId 平台商品ID
-	// State verifying: 创建完成; purchased: 已支付; consumed: 已消费; done: 订单完结; canceled: 订单取消; invalid: 订单无效
+	// State 订单状态
+	// Success 是否验证成功 (发奖依据)
 	// Extras 平台透传信息(可选)
 	VerifyPaymentResponse struct {
-		OrderId   string `json:"order_id"`
-		ProductId string `json:"product_id"`
-		State     string `json:"state"`
-		Extras    string `json:"extras"`
+		OrderId   string             `json:"order_id"`
+		ProductId string             `json:"product_id"`
+		State     OrderExternalState `json:"state"`
+		Success   bool               `json:"-"`
+		Extras    string             `json:"extras"`
 	}
 )

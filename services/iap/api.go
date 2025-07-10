@@ -29,5 +29,9 @@ func (svc *PaymentService) VerifyPayment(ctx context.Context, req VerifyPaymentR
 		return nil, result, err
 	}
 
+	if resp.State == OrderExternalStateVerifySuccess {
+		resp.Success = true
+	}
+
 	return resp, result, nil
 }
