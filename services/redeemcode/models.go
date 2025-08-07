@@ -3,7 +3,7 @@ package redeemcode
 type (
 	RedeemCodeRequest struct {
 		Code   string `json:"code"`
-		RoleId int    `json:"role_id"`
+		RoleId int64  `json:"role_id"`
 	}
 	RedeemCodeResponse struct {
 		Result int               `json:"result"` //CodeResul 见下面状态码
