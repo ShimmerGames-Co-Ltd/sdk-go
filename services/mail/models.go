@@ -30,6 +30,8 @@ type (
 		AppID string `json:"appID"`
 		// 发件人
 		From string `json:"from"`
+		// 服务器ID
+		ServerID string `json:"serverID"`
 		// 收件人
 		To string `json:"to"`
 		// 邮件编号（编号相同表示同一封邮件，只处理一次）
@@ -98,6 +100,8 @@ type (
 		AppID string `json:"appID"`
 		// 发送方
 		From string `json:"from"`
+		// 服务器ID
+		ServerID string `json:"serverID"`
 		// 接收方
 		To []string `json:"to"`
 		// 邮件编号（编号相同表示同一封邮件，只处理一次）
@@ -129,6 +133,8 @@ type (
 	SyncMailRequest struct {
 		AppID    string `json:"appID"`
 		PlayerID string `json:"playerID"`
+		// 服务器ID
+		ServerID string `json:"serverID"`
 		// 用于匹配全服邮件的条件
 		IntMatcher map[string]int64 `json:"intMatcher"`
 		// 用于匹配全服邮件的条件
@@ -149,6 +155,8 @@ type (
 		AppID string `json:"appID"`
 		// 玩家ID
 		PlayerID string `json:"playerID"`
+		// 服务器ID
+		ServerID string `json:"serverID"`
 		// 上次拉取的最后一份邮件的ID
 		LatestMailID int64 `json:"latestMailID"`
 		// 拉取邮件数量
@@ -168,8 +176,10 @@ type (
 type (
 	// GetMailRequest 获取邮件详情请求参数
 	GetMailRequest struct {
-		AppID    string  `json:"appID"`
-		PlayerID string  `json:"playerID"`
+		AppID    string `json:"appID"`
+		PlayerID string `json:"playerID"`
+		// 服务器ID
+		ServerID string  `json:"serverID"`
 		MailIDs  []int64 `json:"mailIDs"`
 	}
 
@@ -187,6 +197,8 @@ type (
 		AppID string `json:"appID"`
 		// 玩家ID
 		PlayerID string `json:"playerID"`
+		// 服务器ID
+		ServerID string `json:"serverID"`
 		// 是否全部已读
 		All bool `json:"all"`
 		// 标记为已读的邮件ID
@@ -208,6 +220,8 @@ type (
 		AppID string `json:"appID"`
 		// 玩家ID
 		PlayerID string `json:"playerID"`
+		// 服务器ID
+		ServerID string `json:"serverID"`
 		// 是否领取所有
 		All bool `json:"all"`
 		// 需要领取的邮件ID
@@ -228,6 +242,8 @@ type (
 		AppID string `json:"appID"`
 		// 玩家ID
 		PlayerID string `json:"playerID"`
+		// 服务器ID
+		ServerID string `json:"serverID"`
 		// 是否全部删除
 		All bool `json:"all"`
 		// 需要删除的邮件ID
