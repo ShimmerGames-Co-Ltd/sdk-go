@@ -68,3 +68,23 @@ type RedeemCodeRecord struct {
 	GroupId    int64  `json:"groupId,omitempty"`
 	RedeemTime int64  `json:"redeemTime,omitempty"`
 }
+
+type (
+	// CheckCodeRequest
+	// Code 兑换码
+	// RoleId 平台角色ID (与 RedeemCode 保持一致, 否则无法判断本人是否已领取)
+	CheckCodeRequest struct {
+		Code   string `json:"code"`
+		RoleId int64  `json:"role_id"`
+	}
+
+	// CheckCodeResponse
+	// Result 结果码, 见 CodeResult* 常量 (只读检查不会返回 CodeResultFailed)
+	// Code 命中的兑换码信息, Result != CodeResultOK 时可能为空
+	// Record 领取记录, 只读检查时通常为空
+	CheckCodeResponse struct {
+		Result int               `json:"result"`
+		Code   *Code             `json:"code"`
+		Record *RedeemCodeRecord `json:"record"`
+	}
+)
