@@ -1,0 +1,16 @@
+{
+  "notes": "body 含 json.NewEncoder().Encode 风格的尾随换行（\\n）。signature 由 pkg/platform/sign.Generate + HmacSha256WithBase64 生成，禁止手算。uri_via_kong 为文档口径（CHAT_BASE=/chat）算法向量；生成本夹具时本机无 Kong:9000，未做真实抓包。",
+  "body_includes_trailing_newline": true,
+  "uri": "/v1/chat/messages",
+  "timestamp": 1735689600,
+  "nonce": "n1",
+  "body": "{\"client_msg_id\":\"00000000-0000-4000-8000-000000000001\",\"channel_id\":\"world\",\"channel_type\":\"world\",\"content\":\"x\"}\n",
+  "secret": "test-auth-secret",
+  "org_id": "10000000000",
+  "app_id": "shim_test",
+  "signature": "yj/YKyBWtHaPus5EQjWvwT86mHlueXZsnGwxNQfddno=",
+  "authorization_header": "organization_id=\"10000000000\",appid=\"shim_test\",nonce=\"n1\",timestamp=\"1735689600\",signature=\"yj/YKyBWtHaPus5EQjWvwT86mHlueXZsnGwxNQfddno=\"",
+  "uri_via_kong": "/chat/v1/chat/messages",
+  "signature_via_kong": "6/3CvMcFrjTJX1j3pmoL/zLxE6rr8q4TPunuuS4g3J4=",
+  "authorization_header_via_kong": "organization_id=\"10000000000\",appid=\"shim_test\",nonce=\"n1\",timestamp=\"1735689600\",signature=\"6/3CvMcFrjTJX1j3pmoL/zLxE6rr8q4TPunuuS4g3J4=\""
+}
