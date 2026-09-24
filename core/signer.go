@@ -51,7 +51,7 @@ func (s *HMACSHA256Signer) Authorization(requestURI, body string, timestamp int6
 }
 
 // UserVerifySign 计算 Auth ServerVerify 的 body.sign：HMAC-SHA1 + Base64 + URL Escape。
-// 原文为升序 KV：appid=&token=&ts=。不要把本算法用在 Chat Authorization 上。
+// 原文为升序 KV：appid=&token=&ts=。不要把本算法用在服务端 HMAC-SHA256 Authorization 上。
 func UserVerifySign(appID, token, secret string, ts int64) string {
 	kv := map[string]string{
 		"appid": appID,

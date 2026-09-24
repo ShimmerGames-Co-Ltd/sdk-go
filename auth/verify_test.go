@@ -16,7 +16,7 @@ func TestVerifySHA1BodySignAndAuthorizationHeader(t *testing.T) {
 	var gotBody verifyBody
 	var gotAuth, gotApp string
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/v1/server/verify" || r.Method != http.MethodPost {
+		if r.URL.Path != "/auth/v1/server/verify" || r.Method != http.MethodPost {
 			t.Errorf("path=%s method=%s", r.URL.Path, r.Method)
 		}
 		gotAuth = r.Header.Get("Authorization")

@@ -11,10 +11,10 @@ const (
 	snowflake = int64(1234567890123456789)
 )
 
-func TestInt64EnvelopeKeepsExact(t *testing.T) {
+func TestInt64ResponseBodyKeepsExact(t *testing.T) {
 	t.Parallel()
 	raw := []byte(`{"code":0,"data":{"seq":9007199254740993,"id":1234567890123456789}}`)
-	env, err := DecodeEnvelope(raw)
+	env, err := DecodeResponseBody(raw)
 	if err != nil {
 		t.Fatal(err)
 	}

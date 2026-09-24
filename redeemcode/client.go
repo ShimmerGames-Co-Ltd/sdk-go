@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	pathRedeem = "/v1/server/codes:redeem"
-	pathCheck  = "/v1/server/codes:check"
+	pathRedeem = "/redeemcode/v1/server/codes:redeem"
+	pathCheck  = "/redeemcode/v1/server/codes:check"
 )
 
 // Client 封装 RedeemServer 代玩家兑换/检查。不封装用户 JWT 兑换与 Admin。

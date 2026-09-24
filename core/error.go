@@ -67,9 +67,6 @@ func (e *ResponseBodyError) Error() string {
 
 func (e *ResponseBodyError) Unwrap() error { return e.Err }
 
-// EnvelopeError 旧名别名。
-type EnvelopeError = ResponseBodyError
-
 // AsAPIError 提取业务 body 错误。
 func AsAPIError(err error) (*APIError, bool) {
 	var apiErr *APIError

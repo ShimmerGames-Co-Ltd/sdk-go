@@ -143,7 +143,7 @@ func (c *Client) DoJSON(ctx context.Context, method, path string, body any, out 
 	if resp.StatusCode != http.StatusOK {
 		return &HTTPError{StatusCode: resp.StatusCode, Body: string(raw), Header: resp.Header.Clone()}
 	}
-	env, err := DecodeEnvelope(raw)
+	env, err := DecodeResponseBody(raw)
 	if err != nil {
 		return err
 	}

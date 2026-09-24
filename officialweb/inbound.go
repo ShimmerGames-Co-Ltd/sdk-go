@@ -88,8 +88,8 @@ func Healthz(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write([]byte("ok"))
 }
 
-// WriteEnvelope 写 HTTP 200 + {code,message,data}。
-func WriteEnvelope(w http.ResponseWriter, code int, message string, data any) {
+// WriteResponseBody 写 HTTP 200 + {code,message,data}。
+func WriteResponseBody(w http.ResponseWriter, code int, message string, data any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	if data == nil {
@@ -105,12 +105,12 @@ func WriteEnvelope(w http.ResponseWriter, code int, message string, data any) {
 func (in *Inbound) wrap(next func(ctx context.Context, r *http.Request, body map[string]any) Reply) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
-			WriteEnvelope(w, 400, "method not allowed", nil)
+			WriteResponseBody(w, 400, "method not allowed", nil)
 			return
 		}
 		raw, err := io.ReadAll(r.Body)
 		if err != nil {
-			WriteEnvelope(w, 500, "read body", nil)
+			WriteResponseBody(w, 500, "read body", nil)
 			return
 		}
 		body := map[string]any{}
@@ -119,7 +119,7 @@ func (in *Inbound) wrap(next func(ctx context.Context, r *http.Request, body map
 			dec := json.NewDecoder(bytes.NewReader(raw))
 			dec.UseNumber()
 			if err := dec.Decode(&body); err != nil {
-				WriteEnvelope(w, 400, "invalid json", nil)
+				WriteResponseBody(w, 400, "invalid json", nil)
 				return
 			}
 		}
@@ -127,10 +127,10 @@ func (in *Inbound) wrap(next func(ctx context.Context, r *http.Request, body map
 		delete(body, "sign")
 		want := SignSortedQSMD5(body, in.Secret)
 		if strings.TrimSpace(gotSign) == "" || gotSign != want {
-			WriteEnvelope(w, 401, "invalid sign", nil)
+			WriteResponseBody(w, 401, "invalid sign", nil)
 			return
 		}
 		rep := next(r.Context(), r, body)
-		WriteEnvelope(w, rep.Code, rep.Message, rep.Data)
+		WriteResponseBody(w, rep.Code, rep.Message, rep.Data)
 	})
 }

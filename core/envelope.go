@@ -5,8 +5,7 @@ import (
 	"fmt"
 )
 
-// ResponseBody 是 Shimo 新 body：HTTP 200 + {code,data,message}（common.Response 形态）。
-// 对外文档勿称 Envelope。
+// ResponseBody 是新 body：HTTP 200 + {code,data,message}（common.Response 形态）。
 type ResponseBody struct {
 	Code    int             `json:"code"`
 	Message string          `json:"message"`
@@ -21,11 +20,6 @@ func DecodeResponseBody(body []byte) (*ResponseBody, error) {
 	}
 	return &env, nil
 }
-
-// Envelope / DecodeEnvelope 保留为旧名别名，避免外部尚未迁完时编译失败；新代码请用 ResponseBody。
-type Envelope = ResponseBody
-
-func DecodeEnvelope(body []byte) (*ResponseBody, error) { return DecodeResponseBody(body) }
 
 // UnmarshalData 把 data 解进 out；data 为空或 null 时跳过。
 func (e *ResponseBody) UnmarshalData(out any) error {

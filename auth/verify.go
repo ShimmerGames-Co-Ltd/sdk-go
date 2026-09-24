@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	pathServerVerify = "/v1/server/verify"
-	pathQueryForSolo = "/v1/server/query4solo"
+	pathServerVerify = "/auth/v1/server/verify"
+	pathQueryForSolo = "/auth/v1/server/query4solo"
 )
 
 // Client 封装游戏服 ServerVerify（HMAC-SHA1 body.sign，外加 SERVER_SIGNATURE Authorization）。
@@ -24,7 +24,7 @@ func New(c *core.Client) (*Client, error) {
 		return nil, &core.ConfigError{Msg: "core.Client 不能为空"}
 	}
 	if c.AuthMode() != core.AuthServerSignature {
-		return nil, &core.ConfigError{Msg: "UserVerify 需要 WithAuthSecret（不要与 Chat Authorization 混用 SHA1）"}
+		return nil, &core.ConfigError{Msg: "UserVerify 需要 WithAuthSecret"}
 	}
 	return &Client{core: c, now: time.Now}, nil
 }

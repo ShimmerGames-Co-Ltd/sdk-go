@@ -8,25 +8,25 @@ import (
 )
 
 const (
-	pathRegister           = "/v1/server/register"
-	pathDelete             = "/v1/server/delete"
-	pathDeleteApp          = "/v1/server/app/delete"
-	pathAllOfAPP           = "/v1/server/app/all"
-	pathAsk                = "/v1/server/ask"
-	pathSetScore           = "/v1/server/score/set"
-	pathIncrScore          = "/v1/server/score/incr"
-	pathGetScore           = "/v1/server/score/get"
-	pathList               = "/v1/server/list"
-	pathBanAdd             = "/v1/server/ban/add"
-	pathBanRemove          = "/v1/server/ban/remove"
-	pathBanClean           = "/v1/server/ban/clean"
-	pathBanGet             = "/v1/server/ban/get"
-	pathBanList            = "/v1/server/ban/list"
-	pathMemberInfo         = "/v1/server/member/info"
-	pathHistoryMemberInfo  = "/v1/server/history/member/info"
+	pathRegister           = "/leaderboard/v1/server/register"
+	pathDelete             = "/leaderboard/v1/server/delete"
+	pathDeleteApp          = "/leaderboard/v1/server/app/delete"
+	pathAllOfAPP           = "/leaderboard/v1/server/app/all"
+	pathAsk                = "/leaderboard/v1/server/ask"
+	pathSetScore           = "/leaderboard/v1/server/score/set"
+	pathIncrScore          = "/leaderboard/v1/server/score/incr"
+	pathGetScore           = "/leaderboard/v1/server/score/get"
+	pathList               = "/leaderboard/v1/server/list"
+	pathBanAdd             = "/leaderboard/v1/server/ban/add"
+	pathBanRemove          = "/leaderboard/v1/server/ban/remove"
+	pathBanClean           = "/leaderboard/v1/server/ban/clean"
+	pathBanGet             = "/leaderboard/v1/server/ban/get"
+	pathBanList            = "/leaderboard/v1/server/ban/list"
+	pathMemberInfo         = "/leaderboard/v1/server/member/info"
+	pathHistoryMemberInfo  = "/leaderboard/v1/server/history/member/info"
 )
 
-// Client 封装 Leaderboard 游戏服主路径 /v1/server/*。
+// Client 封装 Leaderboard 游戏服主路径 /leaderboard/v1/server/*。
 type Client struct {
 	core *core.Client
 }

@@ -8,16 +8,16 @@ import (
 )
 
 const (
-	pathLogin      = "/v1/mail/server/login"
-	pathSync       = "/v1/mail/server/sync"
-	pathList       = "/v1/mail/server/list"
-	pathGet        = "/v1/mail/server/get"
-	pathRead       = "/v1/mail/server/read"
-	pathClaim      = "/v1/mail/server/claim"
-	pathRemove     = "/v1/mail/server/remove"
-	pathSendPlayer = "/v1/mail/server/send/player"
-	pathSendGroup  = "/v1/mail/server/send/group"
-	pathSendServer = "/v1/mail/server/send/server"
+	pathLogin      = "/mail/v1/mail/server/login"
+	pathSync       = "/mail/v1/mail/server/sync"
+	pathList       = "/mail/v1/mail/server/list"
+	pathGet        = "/mail/v1/mail/server/get"
+	pathRead       = "/mail/v1/mail/server/read"
+	pathClaim      = "/mail/v1/mail/server/claim"
+	pathRemove     = "/mail/v1/mail/server/remove"
+	pathSendPlayer = "/mail/v1/mail/server/send/player"
+	pathSendGroup  = "/mail/v1/mail/server/send/group"
+	pathSendServer = "/mail/v1/mail/server/send/server"
 )
 
 // Client 封装 MailServer（SERVER_SIGNATURE）。不封装 MailUser / MailLegacy。
