@@ -15,7 +15,7 @@ c, err := core.NewClient(
     core.WithURL(os.Getenv("SHIMO_URL")), // 网关根，不要带 /auth
     core.WithAppID(appID),
     core.WithOrganizationID(orgID),
-    core.WithAuthSecret(secret),
+    core.WithServerSignSecret(secret), // Hub app.auth_secret，不是 sdk_secret
 )
 cli, err := auth.New(c)
 reply, err := cli.Verify(ctx, userToken)

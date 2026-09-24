@@ -23,7 +23,7 @@ func TestRedeemAndCheckPaths(t *testing.T) {
 		_, _ = w.Write([]byte(`{"code":0,"data":{"result":0,"code":{"code":"ABC","reward":"gold"},"record":{"user_id":"u1","rewarded":true}}}`))
 	}))
 	t.Cleanup(srv.Close)
-	corec, _ := core.NewClient(core.WithURL(srv.URL), core.WithAppID("app1"), core.WithAuthSecret("s"))
+	corec, _ := core.NewClient(core.WithURL(srv.URL), core.WithAppID("app1"), core.WithServerSignSecret("s"))
 	cli, err := New(corec)
 	if err != nil {
 		t.Fatal(err)

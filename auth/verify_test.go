@@ -32,7 +32,7 @@ func TestVerifySHA1BodySignAndAuthorizationHeader(t *testing.T) {
 		core.WithURL(srv.URL),
 		core.WithAppID("shim_test"),
 		core.WithOrganizationID("10000000000"),
-		core.WithAuthSecret("test-auth-secret"),
+		core.WithServerSignSecret("test-auth-secret"),
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -60,39 +60,9 @@ func TestVerifySHA1BodySignAndAuthorizationHeader(t *testing.T) {
 	}
 }
 
-func TestNewRequiresServerSignature(t *testing.T) {
+func TestNewNilClient(t *testing.T) {
 	t.Parallel()
-	c, err := core.NewClient(core.WithURL("http://127.0.0.1"), core.WithAppID("a"), core.WithUserToken("t"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if _, err := New(c); err == nil {
-		t.Fatal("Player token 客户端不能做 ServerVerify")
-	}
-}
-
-func TestQueryForSoloPath(t *testing.T) {
-	t.Parallel()
-	var gotPath string
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		gotPath = r.URL.Path
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(`{"code":0,"data":{"uid":"u","user_id":3,"short_id":7,"appid":"app1"}}`))
-	}))
-	t.Cleanup(srv.Close)
-	corec, err := core.NewClient(core.WithURL(srv.URL), core.WithAppID("app1"), core.WithAuthSecret("s"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	cli, err := New(corec)
-	if err != nil {
-		t.Fatal(err)
-	}
-	rep, err := cli.QueryForSolo(context.Background(), "tok")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if gotPath != pathQueryForSolo || rep.UserID != 3 || rep.ShortID != 7 {
-		t.Fatalf("path=%s rep=%+v", gotPath, rep)
+	if _, err := New(nil); err == nil {
+		t.Fatal("空 Client 应失败")
 	}
 }

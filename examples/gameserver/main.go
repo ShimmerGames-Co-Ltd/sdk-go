@@ -29,7 +29,7 @@ func main() {
 		core.WithURL(baseURL),
 		core.WithAppID(appID),
 		core.WithOrganizationID(orgID),
-		core.WithAuthSecret(secret),
+		core.WithServerSignSecret(secret),
 	)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)

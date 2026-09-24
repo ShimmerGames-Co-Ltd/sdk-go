@@ -15,7 +15,6 @@ const (
 	headerAuthorization   = "Authorization"
 	headerAppID           = "X-App-ID"
 	headerOrganizationID  = "X-Organization-ID"
-	headerUserToken       = "X-User-Token"
 	headerServerVersion   = "X-Server-Version"
 	headerUserAgent       = "User-Agent"
 	headerUserAgentFormat = "ShimmerSDK-Go %s %s"

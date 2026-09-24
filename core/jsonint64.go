@@ -10,8 +10,11 @@ import (
 // 新 body 的 protojson 把 int64 编成 string；请求侧仍按 number 发出。
 type JSONInt64 int64
 
-func (n JSONInt64) MarshalJSON() ([]byte, error) {
-	return []byte(strconv.FormatInt(int64(n), 10)), nil
+func (n *JSONInt64) MarshalJSON() ([]byte, error) {
+	if n == nil {
+		return []byte("0"), nil
+	}
+	return []byte(strconv.FormatInt(int64(*n), 10)), nil
 }
 
 func (n *JSONInt64) UnmarshalJSON(b []byte) error {

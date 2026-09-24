@@ -21,9 +21,6 @@ func New(c *core.Client) (*Client, error) {
 	if c == nil {
 		return nil, &core.ConfigError{Msg: "core.Client 不能为空"}
 	}
-	if c.AuthMode() != core.AuthServerSignature {
-		return nil, &core.ConfigError{Msg: "RedeemServer 需要 WithAuthSecret"}
-	}
 	return &Client{core: c}, nil
 }
 

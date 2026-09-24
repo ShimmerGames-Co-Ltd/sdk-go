@@ -8,22 +8,22 @@ import (
 )
 
 const (
-	pathRegister           = "/leaderboard/v1/server/register"
-	pathDelete             = "/leaderboard/v1/server/delete"
-	pathDeleteApp          = "/leaderboard/v1/server/app/delete"
-	pathAllOfAPP           = "/leaderboard/v1/server/app/all"
-	pathAsk                = "/leaderboard/v1/server/ask"
-	pathSetScore           = "/leaderboard/v1/server/score/set"
-	pathIncrScore          = "/leaderboard/v1/server/score/incr"
-	pathGetScore           = "/leaderboard/v1/server/score/get"
-	pathList               = "/leaderboard/v1/server/list"
-	pathBanAdd             = "/leaderboard/v1/server/ban/add"
-	pathBanRemove          = "/leaderboard/v1/server/ban/remove"
-	pathBanClean           = "/leaderboard/v1/server/ban/clean"
-	pathBanGet             = "/leaderboard/v1/server/ban/get"
-	pathBanList            = "/leaderboard/v1/server/ban/list"
-	pathMemberInfo         = "/leaderboard/v1/server/member/info"
-	pathHistoryMemberInfo  = "/leaderboard/v1/server/history/member/info"
+	pathRegister          = "/leaderboard/v1/server/register"
+	pathDelete            = "/leaderboard/v1/server/delete"
+	pathDeleteApp         = "/leaderboard/v1/server/app/delete"
+	pathAllOfAPP          = "/leaderboard/v1/server/app/all"
+	pathAsk               = "/leaderboard/v1/server/ask"
+	pathSetScore          = "/leaderboard/v1/server/score/set"
+	pathIncrScore         = "/leaderboard/v1/server/score/incr"
+	pathGetScore          = "/leaderboard/v1/server/score/get"
+	pathList              = "/leaderboard/v1/server/list"
+	pathBanAdd            = "/leaderboard/v1/server/ban/add"
+	pathBanRemove         = "/leaderboard/v1/server/ban/remove"
+	pathBanClean          = "/leaderboard/v1/server/ban/clean"
+	pathBanGet            = "/leaderboard/v1/server/ban/get"
+	pathBanList           = "/leaderboard/v1/server/ban/list"
+	pathMemberInfo        = "/leaderboard/v1/server/member/info"
+	pathHistoryMemberInfo = "/leaderboard/v1/server/history/member/info"
 )
 
 // Client 封装 Leaderboard 游戏服主路径 /leaderboard/v1/server/*。
@@ -34,9 +34,6 @@ type Client struct {
 func New(c *core.Client) (*Client, error) {
 	if c == nil {
 		return nil, &core.ConfigError{Msg: "core.Client 不能为空"}
-	}
-	if c.AuthMode() != core.AuthServerSignature {
-		return nil, &core.ConfigError{Msg: "Leaderboard 游戏服需要 WithAuthSecret"}
 	}
 	return &Client{core: c}, nil
 }

@@ -31,13 +31,15 @@ c, err := core.NewClient(
     core.WithURL("http://platform-api.shimmer.lab"),
     core.WithAppID(appID),
     core.WithOrganizationID(orgID),
-    core.WithAuthSecret(authSecret),
+    core.WithServerSignSecret(serverSignSecret), // Hub app.auth_secret，不是 sdk_secret
 )
 ```
 
-默认带 `X-Server-Version: v3.5.0`。不要设置 `X-SDK-Version: v1.2.0`。密钥只从环境变量或密钥系统读取。
+`WithURL`、`WithAppID`、`WithServerSignSecret` 必填。`WithOrganizationID` 与 `WithHTTPClient` 可选。没有玩家 token、没有可改的版本头、没有 path 前缀或自定义签算 URI。
 
-同一 `*core.Client` 可交给 `auth.New`、`mail.New`、`iap.New`、`leaderboard.New`、`redeemcode.New`。这些包要求 `WithAuthSecret`。
+默认带 `X-Server-Version: v3.5.0`，调用方不能改。不要设置 `X-SDK-Version`。密钥只从环境变量或密钥系统读取。
+
+同一 `*core.Client` 可交给 `auth.New`、`mail.New`、`iap.New`、`leaderboard.New`、`redeemcode.New`。这些 `New` 只拒绝空 Client。
 
 ## 3. 新 body 与错误
 
@@ -67,7 +69,7 @@ SDK 路径已经包含网关服务前缀。Kong `strip_path` 之后，服务用 
 
 `/mail/v1/mail/...` 是预期形态：前缀 `/mail`，服务自己的路径仍是 `/v1/mail/...`。
 
-直连没有前缀的 upstream 时，改用该服务的 base URL，或用 `core.WithPathPrefix` 调整签算 URI。不要由调用方设置 `X-Original-URI`。
+直连上游时 `WithURL` 仍填该进程根地址，path 与经 Kong 时相同。SDK 不再提供改签算 URI 或额外前缀。不要由调用方设置 `X-Original-URI`。
 
 `officialweb` 挂在**游戏服**上，路径是 `/payment/*`，不走上表前缀。
 
@@ -80,7 +82,7 @@ cli, _ := auth.New(c)
 rep, err := cli.Verify(ctx, userToken)
 ```
 
-`Verify` 的 body 另有 HMAC-SHA1（`appid`/`token`/`ts`），与上面的 Authorization 不是同一套算法。
+`Verify` 的 body 另有 HMAC-SHA1（`appid`/`token`/`ts`），密钥与 Authorization 相同，算法不同。
 
 ### mail
 

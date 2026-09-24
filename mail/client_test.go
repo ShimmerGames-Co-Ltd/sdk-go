@@ -16,21 +16,17 @@ func testCore(t *testing.T, h http.HandlerFunc) *core.Client {
 	t.Helper()
 	srv := httptest.NewServer(h)
 	t.Cleanup(srv.Close)
-	c, err := core.NewClient(core.WithURL(srv.URL), core.WithAppID("app1"), core.WithAuthSecret("s"), core.WithOrganizationID("1"))
+	c, err := core.NewClient(core.WithURL(srv.URL), core.WithAppID("app1"), core.WithServerSignSecret("s"), core.WithOrganizationID("1"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	return c
 }
 
-func TestNewRequiresServerSignature(t *testing.T) {
+func TestNewNilClient(t *testing.T) {
 	t.Parallel()
-	c, err := core.NewClient(core.WithURL("http://127.0.0.1"), core.WithAppID("a"), core.WithUserToken("t"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if _, err := New(c); err == nil {
-		t.Fatal("Player token 不能做 MailServer")
+	if _, err := New(nil); err == nil {
+		t.Fatal("空 Client 应失败")
 	}
 }
 

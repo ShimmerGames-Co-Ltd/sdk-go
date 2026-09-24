@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	pathVerifyOrder     = "/iap/v1/server/verify_order"
-	pathRecordPurchase  = "/iap/v1/server/record_purchase"
+	pathVerifyOrder    = "/iap/v1/server/verify_order"
+	pathRecordPurchase = "/iap/v1/server/record_purchase"
 )
 
 // Client 封装游戏服 IAP：验单与代录购买。不封装用户创单/pending/回调。
@@ -20,9 +20,6 @@ type Client struct {
 func New(c *core.Client) (*Client, error) {
 	if c == nil {
 		return nil, &core.ConfigError{Msg: "core.Client 不能为空"}
-	}
-	if c.AuthMode() != core.AuthServerSignature {
-		return nil, &core.ConfigError{Msg: "IAP 游戏服需要 WithAuthSecret"}
 	}
 	return &Client{core: c}, nil
 }

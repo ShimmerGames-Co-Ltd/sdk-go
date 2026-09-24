@@ -22,7 +22,7 @@ func TestVerifyOrderPathAndSuccess(t *testing.T) {
 		_, _ = w.Write([]byte(`{"code":0,"data":{"order_id":"o1","product_id":"sku","state":6}}`))
 	}))
 	t.Cleanup(srv.Close)
-	corec, err := core.NewClient(core.WithURL(srv.URL), core.WithAppID("app1"), core.WithAuthSecret("s"))
+	corec, err := core.NewClient(core.WithURL(srv.URL), core.WithAppID("app1"), core.WithServerSignSecret("s"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -55,7 +55,7 @@ func TestRecordPurchaseAndHTTPError(t *testing.T) {
 		_, _ = w.Write([]byte(`no`))
 	}))
 	t.Cleanup(srv.Close)
-	corec, _ := core.NewClient(core.WithURL(srv.URL), core.WithAppID("app1"), core.WithAuthSecret("s"))
+	corec, _ := core.NewClient(core.WithURL(srv.URL), core.WithAppID("app1"), core.WithServerSignSecret("s"))
 	cli, _ := New(corec)
 	err := cli.RecordPurchase(context.Background(), RecordPurchaseRequest{PackageName: "pkg", PayChannel: "google", ProductID: "p", PurchaseToken: "t"})
 	if _, ok := core.AsHTTPError(err); !ok {

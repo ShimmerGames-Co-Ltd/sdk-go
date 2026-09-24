@@ -16,7 +16,7 @@ func testCore(t *testing.T, h http.HandlerFunc) *core.Client {
 	t.Helper()
 	srv := httptest.NewServer(h)
 	t.Cleanup(srv.Close)
-	c, err := core.NewClient(core.WithURL(srv.URL), core.WithAppID("app1"), core.WithAuthSecret("s"), core.WithOrganizationID("1"))
+	c, err := core.NewClient(core.WithURL(srv.URL), core.WithAppID("app1"), core.WithServerSignSecret("s"), core.WithOrganizationID("1"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -84,10 +84,9 @@ func TestHistoryMemberInfoAndAPIError(t *testing.T) {
 	}
 }
 
-func TestNewRequiresSecret(t *testing.T) {
+func TestNewNilClient(t *testing.T) {
 	t.Parallel()
-	c, _ := core.NewClient(core.WithURL("http://127.0.0.1"), core.WithAppID("a"), core.WithUserToken("t"))
-	if _, err := New(c); err == nil {
-		t.Fatal("expected error")
+	if _, err := New(nil); err == nil {
+		t.Fatal("空 Client 应失败")
 	}
 }

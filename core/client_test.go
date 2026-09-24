@@ -12,16 +12,16 @@ import (
 	"time"
 )
 
-func TestNewClientRequiresURLAndAuth(t *testing.T) {
+func TestNewClientRequiresURLAppAndSecret(t *testing.T) {
 	t.Parallel()
-	if _, err := NewClient(WithAppID("a"), WithAuthSecret("s")); err == nil {
+	if _, err := NewClient(WithAppID("a"), WithServerSignSecret("s")); err == nil {
 		t.Fatal("缺 URL 应失败")
 	}
-	if _, err := NewClient(WithURL("http://127.0.0.1"), WithAppID("a")); err == nil {
-		t.Fatal("缺鉴权应失败")
+	if _, err := NewClient(WithURL("http://127.0.0.1"), WithServerSignSecret("s")); err == nil {
+		t.Fatal("缺 AppID 应失败")
 	}
-	if _, err := NewClient(WithURL("http://127.0.0.1"), WithAppID("a"), WithAuthSecret("s"), WithUserToken("t")); err == nil {
-		t.Fatal("双鉴权应失败")
+	if _, err := NewClient(WithURL("http://127.0.0.1"), WithAppID("a")); err == nil {
+		t.Fatal("缺 WithServerSignSecret 应失败")
 	}
 }
 
@@ -33,7 +33,7 @@ func TestDoJSONBusinessCodeIsAPIErrorNotHTTPError(t *testing.T) {
 	}))
 	t.Cleanup(srv.Close)
 
-	c, err := NewClient(WithURL(srv.URL), WithAppID("shim_test"), WithAuthSecret("secret"))
+	c, err := NewClient(WithURL(srv.URL), WithAppID("shim_test"), WithServerSignSecret("secret"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -54,7 +54,7 @@ func TestDoJSONNon200IsHTTPError(t *testing.T) {
 	}))
 	t.Cleanup(srv.Close)
 
-	c, err := NewClient(WithURL(srv.URL), WithAppID("shim_test"), WithUserToken("tok"))
+	c, err := NewClient(WithURL(srv.URL), WithAppID("shim_test"), WithServerSignSecret("secret"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -90,7 +90,7 @@ func TestDoJSONGETAndPOSTAndHeaders(t *testing.T) {
 		WithURL(srv.URL),
 		WithAppID("shim_test"),
 		WithOrganizationID("10000000000"),
-		WithAuthSecret("test-auth-secret"),
+		WithServerSignSecret("test-auth-secret"),
 		withNow(func() time.Time { return fixedNow }),
 		withNonce(func() (string, error) { return "n1", nil }),
 	)
@@ -108,7 +108,7 @@ func TestDoJSONGETAndPOSTAndHeaders(t *testing.T) {
 		t.Fatalf("method=%s", gotMethod)
 	}
 	if gotToken != "" {
-		t.Fatal("GameServer 不应带 X-User-Token")
+		t.Fatal("不应带 X-User-Token")
 	}
 	if gotApp != "shim_test" || gotVer != DefaultServerVersion {
 		t.Fatalf("app=%s ver=%s", gotApp, gotVer)
@@ -123,21 +123,17 @@ func TestDoJSONGETAndPOSTAndHeaders(t *testing.T) {
 		t.Fatal("data 未解码")
 	}
 
-	player, err := NewClient(WithURL(srv.URL), WithAppID("shim_test"), WithUserToken("player-tok"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := player.DoJSON(context.Background(), http.MethodGet, "/v1/chat/messages?peer_id=b", nil, nil); err != nil {
+	if err := gs.DoJSON(context.Background(), http.MethodGet, "/v1/chat/messages?peer_id=b", nil, nil); err != nil {
 		t.Fatal(err)
 	}
 	if gotMethod != http.MethodGet {
 		t.Fatalf("GET method=%s", gotMethod)
 	}
-	if gotAuth != "" {
-		t.Fatal("Player 不应带 Authorization")
+	if gotAuth == "" {
+		t.Fatal("GET 也应带 Authorization")
 	}
-	if gotToken != "player-tok" {
-		t.Fatalf("token=%s", gotToken)
+	if gotToken != "" {
+		t.Fatal("GET 不应带 X-User-Token")
 	}
 }
 
@@ -149,7 +145,7 @@ func TestDoJSONSuccessData(t *testing.T) {
 		})
 	}))
 	t.Cleanup(srv.Close)
-	c, err := NewClient(WithURL(srv.URL), WithAppID("a"), WithUserToken("t"))
+	c, err := NewClient(WithURL(srv.URL), WithAppID("a"), WithServerSignSecret("s"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -179,7 +175,7 @@ func TestWithHTTPClientIsHonored(t *testing.T) {
 	c, err := NewClient(
 		WithURL("http://example.invalid"),
 		WithAppID("a"),
-		WithUserToken("t"),
+		WithServerSignSecret("s"),
 		WithHTTPClient(&http.Client{Transport: rt}),
 	)
 	if err != nil {
@@ -193,11 +189,11 @@ func TestWithHTTPClientIsHonored(t *testing.T) {
 	}
 }
 
-func TestPathPrefixUsedInSignURINotRequestPath(t *testing.T) {
+func TestSignedURIEqualsRequestURI(t *testing.T) {
 	t.Parallel()
 	var gotPath, gotAuth string
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		gotPath = r.URL.Path
+		gotPath = r.URL.RequestURI()
 		gotAuth = r.Header.Get("Authorization")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(`{"code":0,"data":{}}`))
@@ -208,23 +204,22 @@ func TestPathPrefixUsedInSignURINotRequestPath(t *testing.T) {
 		WithURL(srv.URL),
 		WithAppID("shim_test"),
 		WithOrganizationID("10000000000"),
-		WithAuthSecret("test-auth-secret"),
-		WithPathPrefix("/chat"),
+		WithServerSignSecret("test-auth-secret"),
 		withNow(func() time.Time { return fixed }),
 		withNonce(func() (string, error) { return "n1", nil }),
 	)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := c.DoJSON(context.Background(), http.MethodGet, "/v1/chat/messages", nil, nil); err != nil {
+	if err := c.DoJSON(context.Background(), http.MethodGet, "/leaderboard/v1/server/list?id=1", nil, nil); err != nil {
 		t.Fatal(err)
 	}
-	if gotPath != "/v1/chat/messages" {
-		t.Fatalf("HTTP path 不应被 PathPrefix 改写: %s", gotPath)
+	if gotPath != "/leaderboard/v1/server/list?id=1" {
+		t.Fatalf("path=%s", gotPath)
 	}
-	want := SignAuthorization("10000000000", "shim_test", "test-auth-secret", "/chat/v1/chat/messages", "", 1735689600, "n1")
+	want := SignAuthorization("10000000000", "shim_test", "test-auth-secret", gotPath, "", 1735689600, "n1")
 	if gotAuth != want {
-		t.Fatalf("sign URI 应对齐 PathPrefix\n got %s\nwant %s", gotAuth, want)
+		t.Fatalf("签算 URI 应等于请求 URI\n got %s\nwant %s", gotAuth, want)
 	}
 }
 

@@ -13,37 +13,24 @@ import (
 	"time"
 )
 
-// AuthMode 构造期选定，禁止每请求切换。
-type AuthMode int
-
-const (
-	AuthUnspecified AuthMode = iota
-	AuthServerSignature
-	AuthUserToken
-)
-
-// Client 是签名 + 新信封 HTTP 客户端。游戏服不要 import 主仓内部包，只依赖本 module。
+// Client 是游戏服签名 HTTP 客户端。只支持服务器签名，不要 import 主仓内部包。
 type Client struct {
-	httpClient     *http.Client
-	url            string
-	appID          string
-	organizationID string
-	authSecret     string
-	userToken      string
-	serverVersion  string
-	pathPrefix     string
-	signRequestURI func(method, requestURI string) string
-	now            func() time.Time
-	nonce          func() (string, error)
-	mode           AuthMode
+	httpClient       *http.Client
+	url              string
+	appID            string
+	organizationID   string
+	serverSignSecret string
+	serverVersion    string
+	now              func() time.Time
+	nonce            func() (string, error)
 }
 
-// NewClient 创建客户端。WithURL 与 WithAppID 必填；鉴权二选一：WithAuthSecret 或 WithUserToken。
+// NewClient 创建客户端。WithURL、WithAppID、WithServerSignSecret 必填。
+// X-Server-Version 固定为 v3.5.0。
 func NewClient(opts ...Option) (*Client, error) {
 	s := &settings{
-		ServerVersion: DefaultServerVersion,
-		Now:           func() time.Time { return time.Now() },
-		Nonce:         randomNonce,
+		Now:   func() time.Time { return time.Now() },
+		Nonce: randomNonce,
 	}
 	for _, opt := range opts {
 		if opt == nil {
@@ -59,15 +46,8 @@ func NewClient(opts ...Option) (*Client, error) {
 	if s.AppID == "" {
 		return nil, &ConfigError{Msg: "WithAppID 必填"}
 	}
-	if s.AuthSecret != "" && s.UserToken != "" {
-		return nil, &ConfigError{Msg: "WithAuthSecret 与 WithUserToken 不能同时设置"}
-	}
-	if s.AuthSecret == "" && s.UserToken == "" {
-		return nil, &ConfigError{Msg: "必须设置 WithAuthSecret 或 WithUserToken"}
-	}
-	mode := AuthUserToken
-	if s.AuthSecret != "" {
-		mode = AuthServerSignature
+	if s.ServerSignSecret == "" {
+		return nil, &ConfigError{Msg: "WithServerSignSecret 必填"}
 	}
 	hc := s.HTTPClient
 	if hc == nil {
@@ -79,30 +59,24 @@ func NewClient(opts ...Option) (*Client, error) {
 	if s.Nonce == nil {
 		s.Nonce = randomNonce
 	}
-	if s.ServerVersion == "" {
-		s.ServerVersion = DefaultServerVersion
-	}
 	return &Client{
-		httpClient:     hc,
-		url:            s.URL,
-		appID:          s.AppID,
-		organizationID: s.OrganizationID,
-		authSecret:     s.AuthSecret,
-		userToken:      s.UserToken,
-		serverVersion:  s.ServerVersion,
-		pathPrefix:     s.PathPrefix,
-		signRequestURI: s.SignRequestURI,
-		now:            s.Now,
-		nonce:          s.Nonce,
-		mode:           mode,
+		httpClient:       hc,
+		url:              s.URL,
+		appID:            s.AppID,
+		organizationID:   s.OrganizationID,
+		serverSignSecret: s.ServerSignSecret,
+		serverVersion:    DefaultServerVersion,
+		now:              s.Now,
+		nonce:            s.Nonce,
 	}, nil
 }
 
-func (c *Client) AppID() string      { return c.appID }
-func (c *Client) AuthMode() AuthMode { return c.mode }
-func (c *Client) AuthSecret() string { return c.authSecret }
+func (c *Client) AppID() string { return c.appID }
 
-// DoJSON 发送 JSON 请求并解码新信封。POST 的 body 使用 json.Encoder（带尾随换行）参与签算。
+// ServerSignSecret 返回服务器 SDK 签名秘钥（Hub app.auth_secret）。
+func (c *Client) ServerSignSecret() string { return c.serverSignSecret }
+
+// DoJSON 发送 JSON 请求并解码新 body。POST 的 body 使用 json.Encoder（带尾随换行）参与签算。
 func (c *Client) DoJSON(ctx context.Context, method, path string, body any, out any) error {
 	if ctx == nil {
 		ctx = context.Background()
@@ -161,38 +135,17 @@ func (c *Client) applyHeaders(req *http.Request, method, requestURI, bodyStr str
 	if req.Body != nil && method != http.MethodGet && method != http.MethodHead {
 		req.Header.Set(headerContentType, headerContentJSON)
 	}
-	switch c.mode {
-	case AuthServerSignature:
-		if c.organizationID != "" {
-			req.Header.Set(headerOrganizationID, c.organizationID)
-		}
-		ts := c.now().Unix()
-		nonce, err := c.nonce()
-		if err != nil {
-			return &TransportError{Err: err}
-		}
-		signURI := c.signURI(method, requestURI)
-		signer := HMACSHA256Signer{OrganizationID: c.organizationID, AppID: c.appID, Secret: c.authSecret}
-		req.Header.Set(headerAuthorization, signer.Authorization(signURI, bodyStr, ts, nonce))
-	case AuthUserToken:
-		req.Header.Set(headerUserToken, c.userToken)
+	if c.organizationID != "" {
+		req.Header.Set(headerOrganizationID, c.organizationID)
 	}
+	ts := c.now().Unix()
+	nonce, err := c.nonce()
+	if err != nil {
+		return &TransportError{Err: err}
+	}
+	signer := HMACSHA256Signer{OrganizationID: c.organizationID, AppID: c.appID, Secret: c.serverSignSecret}
+	req.Header.Set(headerAuthorization, signer.Authorization(requestURI, bodyStr, ts, nonce))
 	return nil
-}
-
-func (c *Client) signURI(method, requestURI string) string {
-	if c.signRequestURI != nil {
-		return c.signRequestURI(method, requestURI)
-	}
-	if c.pathPrefix == "" {
-		return requestURI
-	}
-	path := requestURI
-	query := ""
-	if i := strings.Index(requestURI, "?"); i >= 0 {
-		path, query = requestURI[:i], requestURI[i:]
-	}
-	return c.pathPrefix + path + query
 }
 
 func (c *Client) buildURL(path string) (fullURL, requestURI string, err error) {

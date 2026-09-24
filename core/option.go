@@ -10,17 +10,13 @@ import (
 type Option func(*settings) error
 
 type settings struct {
-	URL            string
-	AppID          string
-	OrganizationID string
-	AuthSecret     string
-	UserToken      string
-	HTTPClient     *http.Client
-	ServerVersion  string
-	PathPrefix     string
-	SignRequestURI func(method, requestURI string) string
-	Now            func() time.Time
-	Nonce          func() (string, error)
+	URL              string
+	AppID            string
+	OrganizationID   string
+	ServerSignSecret string
+	HTTPClient       *http.Client
+	Now              func() time.Time
+	Nonce            func() (string, error)
 }
 
 func WithURL(u string) Option {
@@ -44,18 +40,12 @@ func WithOrganizationID(id string) Option {
 	}
 }
 
-// WithAuthSecret 启用游戏服 SERVER_SIGNATURE（Authorization HMAC）。
-func WithAuthSecret(secret string) Option {
+// WithServerSignSecret 设置服务器 SDK 签名秘钥。
+// 对应 Hub app.auth_secret，不是客户端 SDK 的 sdk_secret。
+// 同一密钥用于 Authorization（HMAC-SHA256）和 Auth Verify 请求体（HMAC-SHA1）。
+func WithServerSignSecret(secret string) Option {
 	return func(s *settings) error {
-		s.AuthSecret = secret
-		return nil
-	}
-}
-
-// WithUserToken 启用玩家 X-User-Token。
-func WithUserToken(token string) Option {
-	return func(s *settings) error {
-		s.UserToken = token
+		s.ServerSignSecret = secret
 		return nil
 	}
 }
@@ -63,36 +53,6 @@ func WithUserToken(token string) Option {
 func WithHTTPClient(c *http.Client) Option {
 	return func(s *settings) error {
 		s.HTTPClient = c
-		return nil
-	}
-}
-
-func WithServerVersion(v string) Option {
-	return func(s *settings) error {
-		s.ServerVersion = strings.TrimSpace(v)
-		return nil
-	}
-}
-
-// WithPathPrefix 仅影响签算 URI（例如 Kong 未 strip 时的 /chat 前缀），不会改实际请求 URL。
-func WithPathPrefix(prefix string) Option {
-	return func(s *settings) error {
-		if prefix == "" {
-			s.PathPrefix = ""
-			return nil
-		}
-		if !strings.HasPrefix(prefix, "/") {
-			prefix = "/" + prefix
-		}
-		s.PathPrefix = strings.TrimRight(prefix, "/")
-		return nil
-	}
-}
-
-// WithSignRequestURI 完全覆盖签算 URI。SDK 不会设置 X-Original-URI。
-func WithSignRequestURI(fn func(method, requestURI string) string) Option {
-	return func(s *settings) error {
-		s.SignRequestURI = fn
 		return nil
 	}
 }
