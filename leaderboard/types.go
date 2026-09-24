@@ -1,18 +1,20 @@
 package leaderboard
 
+import "github.com/ShimmerGames-Co-Ltd/sdk-go/v3/core"
+
 // JSON 键与 leaderboard proto 字段名一致（proto 本身为 camelCase，如 subId）。
 
 type RegisterRequest struct {
 	ID              string `json:"id"`
 	Name            string `json:"name"`
-	SubID           int64  `json:"subId,omitempty"`
-	StartAt         int64  `json:"startAt"`
-	ReportDuration  int64  `json:"reportDuration"`
-	AliveDuration   int64  `json:"aliveDuration"`
+	SubID           core.JSONInt64  `json:"subId,omitempty"`
+	StartAt         core.JSONInt64  `json:"startAt"`
+	ReportDuration  core.JSONInt64  `json:"reportDuration"`
+	AliveDuration   core.JSONInt64  `json:"aliveDuration"`
 	LoopMax         int32  `json:"loopMax,omitempty"`
 	IsAsc           bool   `json:"isAsc,omitempty"`
-	ScoreMin        int64  `json:"scoreMin,omitempty"`
-	ScoreMax        int64  `json:"scoreMax,omitempty"`
+	ScoreMin        core.JSONInt64  `json:"scoreMin,omitempty"`
+	ScoreMax        core.JSONInt64  `json:"scoreMax,omitempty"`
 	MembersMax      uint32 `json:"membersMax,omitempty"`
 	PageSize        uint32 `json:"pageSize,omitempty"`
 	ReportLimitADay uint32 `json:"reportLimitADay,omitempty"`
@@ -22,18 +24,18 @@ type AskReply struct {
 	AppID           string `json:"appID"`
 	ID              string `json:"id"`
 	Name            string `json:"name"`
-	SubID           int64  `json:"subId"`
-	StartAt         int64  `json:"startAt"`
-	StartCD         int64  `json:"startCD"`
-	ReportDuration  int64  `json:"reportDuration"`
-	ReportCD        int64  `json:"reportCD"`
-	AliveDuration   int64  `json:"aliveDuration"`
-	AliveCD         int64  `json:"aliveCD"`
+	SubID           core.JSONInt64  `json:"subId"`
+	StartAt         core.JSONInt64  `json:"startAt"`
+	StartCD         core.JSONInt64  `json:"startCD"`
+	ReportDuration  core.JSONInt64  `json:"reportDuration"`
+	ReportCD        core.JSONInt64  `json:"reportCD"`
+	AliveDuration   core.JSONInt64  `json:"aliveDuration"`
+	AliveCD         core.JSONInt64  `json:"aliveCD"`
 	LoopMax         int32  `json:"loopMax"`
 	LoopTimes       int32  `json:"loopTimes"`
 	IsAsc           bool   `json:"isAsc"`
-	ScoreMin        int64  `json:"scoreMin"`
-	ScoreMax        int64  `json:"scoreMax"`
+	ScoreMin        core.JSONInt64  `json:"scoreMin"`
+	ScoreMax        core.JSONInt64  `json:"scoreMax"`
 	MembersMax      uint32 `json:"membersMax"`
 	PageSize        uint32 `json:"pageSize"`
 	ReportLimitADay uint32 `json:"reportLimitADay"`
@@ -61,21 +63,21 @@ type AskRequest struct {
 
 type Member struct {
 	UID        string `json:"uid"`
-	Score      int64  `json:"score"`
-	Rank       int64  `json:"rank"`
+	Score      core.JSONInt64  `json:"score"`
+	Rank       core.JSONInt64  `json:"rank"`
 	Attachment string `json:"attachment"`
 }
 
 type ReportLimit struct {
 	Count      uint32 `json:"count"`
-	TomorrowCD int64  `json:"tomorrowCD"`
+	TomorrowCD core.JSONInt64  `json:"tomorrowCD"`
 }
 
 type SetScoreRequest struct {
 	ID         string `json:"id"`
-	SubID      int64  `json:"subId,omitempty"`
+	SubID      core.JSONInt64  `json:"subId,omitempty"`
 	UID        string `json:"uid"`
-	Score      int64  `json:"score"`
+	Score      core.JSONInt64  `json:"score"`
 	Attachment string `json:"attachment,omitempty"`
 }
 
@@ -86,9 +88,9 @@ type SetScoreReply struct {
 
 type IncrScoreRequest struct {
 	ID         string `json:"id"`
-	SubID      int64  `json:"subId,omitempty"`
+	SubID      core.JSONInt64  `json:"subId,omitempty"`
 	UID        string `json:"uid"`
-	Incr       int64  `json:"incr"`
+	Incr       core.JSONInt64  `json:"incr"`
 	Attachment string `json:"attachment,omitempty"`
 }
 
@@ -99,7 +101,7 @@ type IncrScoreReply struct {
 
 type GetScoreRequest struct {
 	ID    string `json:"id"`
-	SubID int64  `json:"subId,omitempty"`
+	SubID core.JSONInt64  `json:"subId,omitempty"`
 	UID   string `json:"uid"`
 }
 
@@ -109,7 +111,7 @@ type GetScoreReply struct {
 
 type ListRequest struct {
 	ID        string `json:"id"`
-	SubID     int64  `json:"subId,omitempty"`
+	SubID     core.JSONInt64  `json:"subId,omitempty"`
 	Offset    uint32 `json:"offset,omitempty"`
 	Limit     uint32 `json:"limit,omitempty"`
 	CallerUID string `json:"callerUid,omitempty"`
@@ -122,7 +124,7 @@ type ListReply struct {
 
 type BanAddRequest struct {
 	UID    string `json:"uid"`
-	StopAt int64  `json:"stopAt"`
+	StopAt core.JSONInt64  `json:"stopAt"`
 }
 
 type BanRemoveRequest struct {
@@ -135,14 +137,14 @@ type BanGetRequest struct {
 
 type BanScoreSnapshot struct {
 	LeaderboardID string `json:"leaderboardID"`
-	SubID         int64  `json:"subId"`
-	Score         int64  `json:"score"`
+	SubID         core.JSONInt64  `json:"subId"`
+	Score         core.JSONInt64  `json:"score"`
 }
 
 type BanDetail struct {
 	UID            string             `json:"uid"`
-	StopAt         int64              `json:"stopAt"`
-	StopCD         int64              `json:"stopCD"`
+	StopAt         core.JSONInt64              `json:"stopAt"`
+	StopCD         core.JSONInt64              `json:"stopCD"`
 	ScoreSnapshots []BanScoreSnapshot `json:"scoreSnapshots"`
 }
 
@@ -170,7 +172,7 @@ type MemberInfoReply struct {
 
 type HistoryMemberInfoRequest struct {
 	ID    string `json:"id"`
-	SubID int64  `json:"subId"`
+	SubID core.JSONInt64  `json:"subId"`
 	UID   string `json:"uid"`
 }
 

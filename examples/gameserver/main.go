@@ -61,7 +61,7 @@ func main() {
 		must(err)
 		rep, err := cli.Verify(ctx, os.Getenv("SHIMO_TOKEN"))
 		must(err)
-		fmt.Printf("auth user_id=%d role_id=%d\n", rep.UserID, rep.RoleID)
+		fmt.Printf("auth user_id=%d role_id=%d\n", int64(rep.UserID), int64(rep.RoleID))
 	case "iap":
 		cli, err := iap.New(c)
 		must(err)

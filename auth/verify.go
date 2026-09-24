@@ -30,8 +30,8 @@ func New(c *core.Client) (*Client, error) {
 }
 
 type VerifyReply struct {
-	UserID         int64  `json:"user_id"`
-	RoleID         int64  `json:"role_id"`
+	UserID         core.JSONInt64  `json:"user_id"`
+	RoleID         core.JSONInt64  `json:"role_id"`
 	OpenID         int32  `json:"open_id"`
 	DispatchServer string `json:"dispatch_server"`
 	RemoteAddr     string `json:"remote_addr"`
@@ -39,7 +39,7 @@ type VerifyReply struct {
 
 type verifyBody struct {
 	Token string `json:"token"`
-	Ts    int64  `json:"ts"`
+	Ts    core.JSONInt64  `json:"ts"`
 	Sign  string `json:"sign"`
 }
 
@@ -51,7 +51,7 @@ func (c *Client) Verify(ctx context.Context, token string) (*VerifyReply, error)
 // VerifyAt 使用固定时间戳，便于对照签名向量。
 func (c *Client) VerifyAt(ctx context.Context, token string, ts int64) (*VerifyReply, error) {
 	sign := core.UserVerifySign(c.core.AppID(), token, c.core.AuthSecret(), ts)
-	body := verifyBody{Token: token, Ts: ts, Sign: sign}
+	body := verifyBody{Token: token, Ts: core.JSONInt64(ts), Sign: sign}
 	var out VerifyReply
 	if err := c.core.DoJSON(ctx, http.MethodPost, pathServerVerify, body, &out); err != nil {
 		return nil, err
@@ -62,7 +62,7 @@ func (c *Client) VerifyAt(ctx context.Context, token string, ts int64) (*VerifyR
 type SoloReply struct {
 	UID     string `json:"uid"`
 	Channel string `json:"channel"`
-	UserID  int64  `json:"user_id"`
+	UserID  core.JSONInt64  `json:"user_id"`
 	ShortID int32  `json:"short_id"`
 	AppID   string `json:"appid"`
 }

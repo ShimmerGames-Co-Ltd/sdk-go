@@ -1,5 +1,7 @@
 package mail
 
+import "github.com/ShimmerGames-Co-Ltd/sdk-go/v3/core"
+
 // 请求与响应 data 均为 snake_case（sdk-go v3）；服务端入站仍可接受旧 camelCase。
 
 type MailType int32
@@ -24,27 +26,27 @@ type MailboxBadge struct {
 }
 
 type MailStatus struct {
-	ReadAt  int64 `json:"read_at"`
-	ClaimAt int64 `json:"claim_at"`
+	ReadAt  core.JSONInt64 `json:"read_at"`
+	ClaimAt core.JSONInt64 `json:"claim_at"`
 }
 
 type MailHeader struct {
-	ID              int64      `json:"id"`
+	ID              core.JSONInt64      `json:"id"`
 	Type            MailType   `json:"type"`
 	From            string     `json:"from"`
 	Title           string     `json:"title"`
 	TemplateID      string     `json:"template_id"`
 	HaveAttachment  bool       `json:"have_attachment"`
 	Status          MailStatus `json:"status"`
-	CreateAt        int64      `json:"create_at"`
-	ExpireAt        int64      `json:"expire_at"`
-	ExpireCD        int64      `json:"expire_cd"`
+	CreateAt        core.JSONInt64      `json:"create_at"`
+	ExpireAt        core.JSONInt64      `json:"expire_at"`
+	ExpireCD        core.JSONInt64      `json:"expire_cd"`
 	ContentCategory string     `json:"content_category"`
 	SubTitle        string     `json:"sub_title"`
 }
 
 type MailDetail struct {
-	ID              int64    `json:"id"`
+	ID              core.JSONInt64    `json:"id"`
 	Type            MailType `json:"type"`
 	From            string   `json:"from"`
 	Title           string   `json:"title"`
@@ -52,15 +54,15 @@ type MailDetail struct {
 	TemplateID      string   `json:"template_id"`
 	TemplateArgs    string   `json:"template_args"`
 	Attachment      string   `json:"attachment"`
-	CreateAt        int64    `json:"create_at"`
-	ExpireAt        int64    `json:"expire_at"`
-	ExpireCD        int64    `json:"expire_cd"`
+	CreateAt        core.JSONInt64    `json:"create_at"`
+	ExpireAt        core.JSONInt64    `json:"expire_at"`
+	ExpireCD        core.JSONInt64    `json:"expire_cd"`
 	ContentCategory string   `json:"content_category"`
 	SubTitle        string   `json:"sub_title"`
 }
 
 type Attachment struct {
-	MailID     int64  `json:"mail_id"`
+	MailID     core.JSONInt64  `json:"mail_id"`
 	TemplateID string `json:"template_id"`
 	Attachment string `json:"attachment"`
 }
@@ -97,7 +99,7 @@ type ListRequest struct {
 	AppID        string `json:"app_id,omitempty"`
 	PlayerID     string `json:"player_id"`
 	ServerID     string `json:"server_id"`
-	LatestMailID int64  `json:"latest_mail_id,omitempty"`
+	LatestMailID core.JSONInt64  `json:"latest_mail_id,omitempty"`
 	Limit        int32  `json:"limit,omitempty"`
 }
 
@@ -168,7 +170,7 @@ type SendPlayerRequest struct {
 	TemplateID   string `json:"template_id,omitempty"`
 	TemplateArgs string `json:"template_args,omitempty"`
 	Attachment   string `json:"attachment,omitempty"`
-	TTL          int64  `json:"ttl,omitempty"`
+	TTL          core.JSONInt64  `json:"ttl,omitempty"`
 	ContentMode  string `json:"content_mode,omitempty"`
 }
 
@@ -188,7 +190,7 @@ type SendGroupRequest struct {
 	TemplateID   string     `json:"template_id,omitempty"`
 	TemplateArgs string     `json:"template_args,omitempty"`
 	Attachment   string     `json:"attachment,omitempty"`
-	TTL          int64      `json:"ttl,omitempty"`
+	TTL          core.JSONInt64      `json:"ttl,omitempty"`
 	ContentMode  string     `json:"content_mode,omitempty"`
 }
 
@@ -212,7 +214,7 @@ type SendServerRequest struct {
 	TemplateID   string     `json:"template_id,omitempty"`
 	TemplateArgs string     `json:"template_args,omitempty"`
 	Attachment   string     `json:"attachment,omitempty"`
-	TTL          int64      `json:"ttl,omitempty"`
+	TTL          core.JSONInt64      `json:"ttl,omitempty"`
 	MatchRule    string     `json:"match_rule,omitempty"`
 	ContentMode  string     `json:"content_mode,omitempty"`
 }

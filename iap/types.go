@@ -1,5 +1,7 @@
 package iap
 
+import "github.com/ShimmerGames-Co-Ltd/sdk-go/v3/core"
+
 // 外部订单状态，对齐 iap.v1.OrderExternalState。
 const (
 	StatePending       int32 = 1
@@ -42,7 +44,7 @@ type RecordPurchaseRequest struct {
 	Extras       string      `json:"extras,omitempty"`
 	Additional   string      `json:"additional,omitempty"`
 	AdjustInfo   *AdjustInfo `json:"adjust_info,omitempty"`
-	UserID       int64       `json:"user_id,omitempty"`
+	UserID       core.JSONInt64       `json:"user_id,omitempty"`
 	AuthOpenID   string      `json:"auth_openid,omitempty"`
 	AuthChannel  string      `json:"auth_channel,omitempty"`
 	RoleID       string      `json:"role_id,omitempty"`
