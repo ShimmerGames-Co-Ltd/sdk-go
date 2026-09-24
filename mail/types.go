@@ -15,8 +15,9 @@ const (
 
 // 内容模式：见主仓 lib/consts.MailContentMode*（如 platform_template / client_template）。
 const (
-	ContentModeUnspecified    = ""
-	ContentModeClientTemplate = "client_template"
+	ContentModeUnspecified      = ""
+	ContentModePlain            = "plain"
+	ContentModeClientTemplate   = "client_template"
 	ContentModePlatformTemplate = "platform_template"
 )
 
@@ -31,40 +32,40 @@ type MailStatus struct {
 }
 
 type MailHeader struct {
-	ID              core.JSONInt64      `json:"id"`
-	Type            MailType   `json:"type"`
-	From            string     `json:"from"`
-	Title           string     `json:"title"`
-	TemplateID      string     `json:"template_id"`
-	HaveAttachment  bool       `json:"have_attachment"`
-	Status          MailStatus `json:"status"`
-	CreateAt        core.JSONInt64      `json:"create_at"`
-	ExpireAt        core.JSONInt64      `json:"expire_at"`
-	ExpireCD        core.JSONInt64      `json:"expire_cd"`
-	ContentCategory string     `json:"content_category"`
-	SubTitle        string     `json:"sub_title"`
+	ID              core.JSONInt64 `json:"id"`
+	Type            MailType       `json:"type"`
+	From            string         `json:"from"`
+	Title           string         `json:"title"`
+	TemplateID      string         `json:"template_id"`
+	HaveAttachment  bool           `json:"have_attachment"`
+	Status          MailStatus     `json:"status"`
+	CreateAt        core.JSONInt64 `json:"create_at"`
+	ExpireAt        core.JSONInt64 `json:"expire_at"`
+	ExpireCD        core.JSONInt64 `json:"expire_cd"`
+	ContentCategory string         `json:"content_category"`
+	SubTitle        string         `json:"sub_title"`
 }
 
 type MailDetail struct {
-	ID              core.JSONInt64    `json:"id"`
-	Type            MailType `json:"type"`
-	From            string   `json:"from"`
-	Title           string   `json:"title"`
-	Content         string   `json:"content"`
-	TemplateID      string   `json:"template_id"`
-	TemplateArgs    string   `json:"template_args"`
-	Attachment      string   `json:"attachment"`
-	CreateAt        core.JSONInt64    `json:"create_at"`
-	ExpireAt        core.JSONInt64    `json:"expire_at"`
-	ExpireCD        core.JSONInt64    `json:"expire_cd"`
-	ContentCategory string   `json:"content_category"`
-	SubTitle        string   `json:"sub_title"`
+	ID              core.JSONInt64 `json:"id"`
+	Type            MailType       `json:"type"`
+	From            string         `json:"from"`
+	Title           string         `json:"title"`
+	Content         string         `json:"content"`
+	TemplateID      string         `json:"template_id"`
+	TemplateArgs    string         `json:"template_args"`
+	Attachment      string         `json:"attachment"`
+	CreateAt        core.JSONInt64 `json:"create_at"`
+	ExpireAt        core.JSONInt64 `json:"expire_at"`
+	ExpireCD        core.JSONInt64 `json:"expire_cd"`
+	ContentCategory string         `json:"content_category"`
+	SubTitle        string         `json:"sub_title"`
 }
 
 type Attachment struct {
-	MailID     core.JSONInt64  `json:"mail_id"`
-	TemplateID string `json:"template_id"`
-	Attachment string `json:"attachment"`
+	MailID     core.JSONInt64 `json:"mail_id"`
+	TemplateID string         `json:"template_id"`
+	Attachment string         `json:"attachment"`
 }
 
 type I18nText struct {
@@ -96,11 +97,11 @@ type SyncReply struct {
 }
 
 type ListRequest struct {
-	AppID        string `json:"app_id,omitempty"`
-	PlayerID     string `json:"player_id"`
-	ServerID     string `json:"server_id"`
-	LatestMailID core.JSONInt64  `json:"latest_mail_id,omitempty"`
-	Limit        int32  `json:"limit,omitempty"`
+	AppID        string         `json:"app_id,omitempty"`
+	PlayerID     string         `json:"player_id"`
+	ServerID     string         `json:"server_id"`
+	LatestMailID core.JSONInt64 `json:"latest_mail_id,omitempty"`
+	Limit        int32          `json:"limit,omitempty"`
 }
 
 type ListReply struct {
@@ -160,18 +161,18 @@ type RemoveReply struct {
 }
 
 type SendPlayerRequest struct {
-	AppID        string `json:"app_id,omitempty"`
-	From         string `json:"from"`
-	ServerID     string `json:"server_id"`
-	To           string `json:"to"`
-	Serial       string `json:"serial"`
-	Title        string `json:"title"`
-	Content      string `json:"content"`
-	TemplateID   string `json:"template_id,omitempty"`
-	TemplateArgs string `json:"template_args,omitempty"`
-	Attachment   string `json:"attachment,omitempty"`
-	TTL          core.JSONInt64  `json:"ttl,omitempty"`
-	ContentMode  string `json:"content_mode,omitempty"`
+	AppID        string         `json:"app_id,omitempty"`
+	From         string         `json:"from"`
+	ServerID     string         `json:"server_id"`
+	To           string         `json:"to"`
+	Serial       string         `json:"serial"`
+	Title        string         `json:"title"`
+	Content      string         `json:"content"`
+	TemplateID   string         `json:"template_id,omitempty"`
+	TemplateArgs string         `json:"template_args,omitempty"`
+	Attachment   string         `json:"attachment,omitempty"`
+	TTL          core.JSONInt64 `json:"ttl,omitempty"`
+	ContentMode  string         `json:"content_mode,omitempty"`
 }
 
 type SendPlayerReply struct {
@@ -180,18 +181,18 @@ type SendPlayerReply struct {
 }
 
 type SendGroupRequest struct {
-	AppID        string     `json:"app_id,omitempty"`
-	From         string     `json:"from"`
-	ServerID     string     `json:"server_id"`
-	To           []string   `json:"to"`
-	Serial       string     `json:"serial"`
-	Title        []I18nText `json:"title"`
-	Content      []I18nText `json:"content"`
-	TemplateID   string     `json:"template_id,omitempty"`
-	TemplateArgs string     `json:"template_args,omitempty"`
-	Attachment   string     `json:"attachment,omitempty"`
-	TTL          core.JSONInt64      `json:"ttl,omitempty"`
-	ContentMode  string     `json:"content_mode,omitempty"`
+	AppID        string         `json:"app_id,omitempty"`
+	From         string         `json:"from"`
+	ServerID     string         `json:"server_id"`
+	To           []string       `json:"to"`
+	Serial       string         `json:"serial"`
+	Title        []I18nText     `json:"title"`
+	Content      []I18nText     `json:"content"`
+	TemplateID   string         `json:"template_id,omitempty"`
+	TemplateArgs string         `json:"template_args,omitempty"`
+	Attachment   string         `json:"attachment,omitempty"`
+	TTL          core.JSONInt64 `json:"ttl,omitempty"`
+	ContentMode  string         `json:"content_mode,omitempty"`
 }
 
 type GroupMailRef struct {
@@ -205,18 +206,18 @@ type SendGroupReply struct {
 }
 
 type SendServerRequest struct {
-	AppID        string     `json:"app_id,omitempty"`
-	From         string     `json:"from"`
-	ServerIDs    []string   `json:"server_ids"`
-	Serial       string     `json:"serial"`
-	Title        []I18nText `json:"title"`
-	Content      []I18nText `json:"content"`
-	TemplateID   string     `json:"template_id,omitempty"`
-	TemplateArgs string     `json:"template_args,omitempty"`
-	Attachment   string     `json:"attachment,omitempty"`
-	TTL          core.JSONInt64      `json:"ttl,omitempty"`
-	MatchRule    string     `json:"match_rule,omitempty"`
-	ContentMode  string     `json:"content_mode,omitempty"`
+	AppID        string         `json:"app_id,omitempty"`
+	From         string         `json:"from"`
+	ServerIDs    []string       `json:"server_ids"`
+	Serial       string         `json:"serial"`
+	Title        []I18nText     `json:"title"`
+	Content      []I18nText     `json:"content"`
+	TemplateID   string         `json:"template_id,omitempty"`
+	TemplateArgs string         `json:"template_args,omitempty"`
+	Attachment   string         `json:"attachment,omitempty"`
+	TTL          core.JSONInt64 `json:"ttl,omitempty"`
+	MatchRule    string         `json:"match_rule,omitempty"`
+	ContentMode  string         `json:"content_mode,omitempty"`
 }
 
 type ServerMailRef struct {
