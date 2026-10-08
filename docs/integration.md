@@ -86,7 +86,18 @@ rep, err := cli.Verify(ctx, userToken)
 
 ### mail
 
-请求 JSON 为 snake_case。平台模板发信：
+请求 JSON 为 snake_case。`content_mode=platform_template` 时，`template_id` 填 Admin 模板 `code`，`title`/`content` 留空；`template_args` 是 **JSON object 的字符串**（整段当作一个 string 字段提交，不是请求体里的嵌套 object）。
+
+键名须与模板正文 `{{key}}` 完全一致（含 `plain.` / `i18n.` 前缀），且须在该 App 的模板参数目录中已启用：
+
+| 前缀 | `template_args` 中的值 | 说明 |
+|------|------------------------|------|
+| `plain.` | JSON 标量（string / number / bool） | 各语言共用同一值 |
+| `i18n.` | JSON object | 键为语言码（与模板 `i18n[].lang`、Login 的 `lang` 同一套，如 `ChineseSimplified`、`English`）；**必须**含 Hub 配置的 App 默认语言；每种语言的值为标量 |
+
+Mail 按玩家 Login 时的 `lang` 解析 `i18n.*`；缺该语言时回退 App 默认语言。只允许模板占位符集合内的键，不可多传；整段 JSON 字符串 ≤ 8192 bytes。
+
+仅标量参数：
 
 ```go
 cli, _ := mail.New(c)
@@ -95,6 +106,12 @@ _, err = cli.SendPlayer(ctx, mail.SendPlayerRequest{
     ContentMode: mail.ContentModePlatformTemplate,
     TemplateID: "welcome", TemplateArgs: `{"plain.player_name":"a"}`,
 })
+```
+
+标量 + 多语言参数混用（`SendGroup` / `SendServer` 的 `template_args` 规则相同）：
+
+```go
+TemplateArgs: `{"plain.player_name":"Ada","i18n.item_name":{"ChineseSimplified":"传说之剑","English":"Legendary Sword"}}`,
 ```
 
 路径：`/mail/v1/mail/server/login|sync|list|get|read|claim|remove` 与 `send/player|group|server`。不要调用旧的 `/mail/send/*`。

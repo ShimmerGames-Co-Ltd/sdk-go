@@ -53,7 +53,7 @@ type MailDetail struct {
 	Title           string         `json:"title"`
 	Content         string         `json:"content"`
 	TemplateID      string         `json:"template_id"`
-	// TemplateArgs platform_template 时为 JSON object 字符串。key 带 plain.（标量）或 i18n.（语言对象）前缀。
+	// TemplateArgs platform_template 存证用；plain.* 标量，i18n.* 为 lang→标量 对象且须含 App 默认语言（读信渲染规则同发信）。
 	TemplateArgs    string         `json:"template_args"`
 	Attachment      string         `json:"attachment"`
 	CreateAt        core.JSONInt64 `json:"create_at"`
@@ -161,6 +161,7 @@ type RemoveReply struct {
 	Badge          MailboxBadge `json:"badge"`
 }
 
+// SendPlayerRequest 个人邮。platform_template 时 TemplateArgs 为 JSON object 字符串：plain.* 标量，i18n.* 为 lang→标量 且须含 App 默认语言。
 type SendPlayerRequest struct {
 	AppID        string         `json:"app_id,omitempty"`
 	From         string         `json:"from"`
@@ -170,7 +171,7 @@ type SendPlayerRequest struct {
 	Title        string         `json:"title"`
 	Content      string         `json:"content"`
 	TemplateID   string         `json:"template_id,omitempty"`
-	TemplateArgs string         `json:"template_args,omitempty"`
+	TemplateArgs string         `json:"template_args,omitempty"` // 见 SendPlayerRequest 类型注释
 	Attachment   string         `json:"attachment,omitempty"`
 	TTL          core.JSONInt64 `json:"ttl,omitempty"`
 	ContentMode  string         `json:"content_mode,omitempty"`
@@ -181,6 +182,7 @@ type SendPlayerReply struct {
 	Badge     MailboxBadge `json:"badge"`
 }
 
+// SendGroupRequest 群组邮。platform_template 时 TemplateArgs 规则同 SendPlayerRequest。
 type SendGroupRequest struct {
 	AppID        string         `json:"app_id,omitempty"`
 	From         string         `json:"from"`
@@ -206,6 +208,7 @@ type SendGroupReply struct {
 	Refs []GroupMailRef `json:"refs"`
 }
 
+// SendServerRequest 全服/条件邮。platform_template 时 TemplateArgs 规则同 SendPlayerRequest。
 type SendServerRequest struct {
 	AppID        string         `json:"app_id,omitempty"`
 	From         string         `json:"from"`
