@@ -53,6 +53,7 @@ type MailDetail struct {
 	Title           string         `json:"title"`
 	Content         string         `json:"content"`
 	TemplateID      string         `json:"template_id"`
+	// TemplateArgs platform_template 时为 JSON object 字符串。key 带 plain.（标量）或 i18n.（语言对象）前缀。
 	TemplateArgs    string         `json:"template_args"`
 	Attachment      string         `json:"attachment"`
 	CreateAt        core.JSONInt64 `json:"create_at"`

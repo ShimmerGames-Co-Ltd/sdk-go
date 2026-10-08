@@ -49,7 +49,7 @@ func TestSendPlayerPathAndSnakeCaseBody(t *testing.T) {
 	}
 	rep, err := cli.SendPlayer(context.Background(), SendPlayerRequest{
 		ServerID: "s1", To: "p1", Serial: "ser", Title: "t", Content: "c", From: "sys",
-		ContentMode: ContentModePlatformTemplate, TemplateID: "welcome", TemplateArgs: `{"name":"a"}`,
+		ContentMode: ContentModePlatformTemplate, TemplateID: "welcome", TemplateArgs: `{"plain.player_name":"a"}`,
 	})
 	if err != nil {
 		t.Fatal(err)

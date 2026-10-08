@@ -93,7 +93,7 @@ cli, _ := mail.New(c)
 _, err = cli.SendPlayer(ctx, mail.SendPlayerRequest{
     ServerID: "1", To: "player-1", Serial: "s1", From: "sys",
     ContentMode: mail.ContentModePlatformTemplate,
-    TemplateID: "welcome", TemplateArgs: `{"name":"a"}`,
+    TemplateID: "welcome", TemplateArgs: `{"plain.player_name":"a"}`,
 })
 ```
 
