@@ -26,7 +26,7 @@ func New(c *core.Client) (*Client, error) {
 type VerifyReply struct {
 	UserID         core.JSONInt64 `json:"user_id"`
 	RoleID         core.JSONInt64 `json:"role_id"`
-	OpenID         int32          `json:"open_id"`
+	ShortID        int32          `json:"short_id"` // 角色短ID
 	DispatchServer string         `json:"dispatch_server"`
 	RemoteAddr     string         `json:"remote_addr"`
 }
@@ -37,7 +37,7 @@ type verifyBody struct {
 	Sign  string         `json:"sign"`
 }
 
-// Verify 校验玩家 token。open_id 字段实际是 short_id（服务端历史口径）。
+// Verify 校验玩家 token。
 func (c *Client) Verify(ctx context.Context, token string) (*VerifyReply, error) {
 	return c.VerifyAt(ctx, token, c.now().Unix())
 }
