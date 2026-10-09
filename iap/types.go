@@ -29,6 +29,7 @@ type VerifyOrderReply struct {
 	ProductID string `json:"product_id"`
 	State     int32  `json:"state"`
 	Extras    string `json:"extras"`
+	Sandbox   bool   `json:"sandbox"` // 是否沙盒订单（与服务端 ServerVerifyOrderReply.sandbox 同源）
 }
 
 // VerifySuccess 是否可作为发奖依据（对齐旧 sdk-go Success 派生）。

@@ -19,7 +19,7 @@ func TestVerifyOrderPathAndSuccess(t *testing.T) {
 		b, _ := io.ReadAll(r.Body)
 		gotBody = string(b)
 		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(`{"code":0,"data":{"order_id":"o1","product_id":"sku","state":6}}`))
+		_, _ = w.Write([]byte(`{"code":0,"data":{"order_id":"o1","product_id":"sku","state":6,"sandbox":true}}`))
 	}))
 	t.Cleanup(srv.Close)
 	corec, err := core.NewClient(core.WithURL(srv.URL), core.WithAppID("app1"), core.WithServerSignSecret("s"))
@@ -40,7 +40,7 @@ func TestVerifyOrderPathAndSuccess(t *testing.T) {
 	if !strings.Contains(gotBody, `"order_id"`) {
 		t.Fatalf("body=%s", gotBody)
 	}
-	if !VerifySuccess(rep.State) || rep.ProductID != "sku" {
+	if !VerifySuccess(rep.State) || rep.ProductID != "sku" || !rep.Sandbox {
 		t.Fatalf("%+v", rep)
 	}
 }
