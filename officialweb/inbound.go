@@ -36,6 +36,7 @@ type Reply struct {
 }
 
 // PaymentHandler 官充五条业务回调。验签与信封由 Inbound 处理。
+// add_order body 可含可选 product_name_i18n（JSON 字符串）；buypayment 不含该字段。
 type PaymentHandler interface {
 	LookupRole(ctx context.Context, r *http.Request, body map[string]any) Reply
 	ListProducts(ctx context.Context, r *http.Request, body map[string]any) Reply

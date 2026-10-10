@@ -132,6 +132,8 @@ JSON 键与 proto 字段名一致（如 `subId`、`startAt`），不是 snake_ca
 
 游戏服实现 `PaymentHandler`，`Inbound.Register` 挂上 `/payment/lookup_role`、`get_goods_list`、`pre_check`、`add_order`、`buypayment` 与 `/healthz`。验签算法是 `SignSortedQSMD5`。业务状态机留在宿主。
 
+`add_order` 请求体可含可选字段 `product_name_i18n`（**JSON 字符串**：Hub 语言 key → 商品名）。有值时参与验签；宿主应在创单时落库，付后发平台模板邮件时包装为 `{"i18n.product_name": <对象>}`。`buypayment` **不**携带该字段。字段契约以中台 `game-inbound.md` §2.4 为准。
+
 ## 6. JSON
 
 | 范围 | 键名 |
