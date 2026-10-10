@@ -130,19 +130,9 @@ JSON 键与 proto 字段名一致（如 `subId`、`startAt`），不是 snake_ca
 
 ### officialweb
 
-游戏服实现 `PaymentHandler`，`Inbound.Register` 挂上 `/payment/lookup_role`、`get_goods_list`、`pre_check`、`add_order`、`buypayment` 与 `/healthz`。验签算法是 `SignSortedQSMD5`。业务状态机留在宿主。
+游戏服实现 `PaymentHandler`（五方法入参为 typed Request struct），`Inbound.Register` 挂上 `/payment/lookup_role`、`get_goods_list`、`pre_check`、`add_order`、`buypayment` 与 `/healthz`。
 
-`PaymentHandler` 仍接收验签后的 `map[string]any`（保留 `json.Number`，避免雪花 ID 丢精度）。需要强类型时，在回调内调用 Parse helpers（**验签之后**）：
-
-| Helper | Struct |
-|--------|--------|
-| `ParseLookupRole` | `LookupRoleRequest` |
-| `ParseListProducts` | `ListProductsRequest` |
-| `ParsePreCheck` | `PreCheckRequest` |
-| `ParseAddOrder` | `AddOrderRequest` |
-| `ParseBuyPayment` | `BuyPaymentRequest` |
-
-必填缺失返回 error；可选字段缺省为空值。`AddOrderRequest.ProductNameI18n` 保持线格式 **字符串**（不做二次 Unmarshal）。`add_order` 可选 `product_name_i18n` 参与验签；宿主落库后付后邮件包装为 `{"i18n.product_name": <对象>}`。`buypayment` **不**携带该字段。契约真源：中台 `game-inbound.md`。
+SDK 负责：验签（`SignSortedQSMD5`）→ JSON Unmarshal → 回调。方法错误、非法 JSON、字段**类型**不符 → `code=400`；验签失败 → `401`。不做必填非空校验；缺字段为零值，由业务处理。`platform_role_id` 等为 **string**（与契约一致；Auth `Verify` 的 `role_id` 为 `JSONInt64`，项目方自行 Format 后写入查角响应）。`AddOrderRequest.ProductNameI18n` 为线格式 JSON 字符串；有值时参与验签，宿主宜落库供付后邮件包装为 `{"i18n.product_name": <对象>}`。`buypayment` 不携带该字段。字段与错误码真源：中台 `game-inbound.md`。
 
 ## 6. JSON
 

@@ -12,19 +12,19 @@ import (
 
 type stubHandler struct{}
 
-func (stubHandler) LookupRole(_ context.Context, _ *http.Request, body map[string]any) Reply {
-	return Reply{Code: CodeSuccess, Message: "ok", Data: map[string]any{"project_role_id": body["project_role_id"]}}
+func (stubHandler) LookupRole(_ context.Context, _ *http.Request, req LookupRoleRequest) Reply {
+	return Reply{Code: CodeSuccess, Message: "ok", Data: map[string]any{"cp_role_id": req.CpRoleID}}
 }
-func (stubHandler) ListProducts(context.Context, *http.Request, map[string]any) Reply {
+func (stubHandler) ListProducts(context.Context, *http.Request, ListProductsRequest) Reply {
 	return Reply{Code: CodeSuccess, Message: "ok", Data: map[string]any{"goods_list": []any{}}}
 }
-func (stubHandler) PreCheck(context.Context, *http.Request, map[string]any) Reply {
+func (stubHandler) PreCheck(context.Context, *http.Request, PreCheckRequest) Reply {
 	return Reply{Code: CodeSuccess, Message: "ok"}
 }
-func (stubHandler) CreateOrder(context.Context, *http.Request, map[string]any) Reply {
-	return Reply{Code: CodeSuccess, Message: "ok", Data: map[string]any{"cp_oid": "cp-1"}}
+func (stubHandler) CreateOrder(context.Context, *http.Request, AddOrderRequest) Reply {
+	return Reply{Code: CodeSuccess, Message: "ok", Data: map[string]any{"cp_order_id": "cp-1"}}
 }
-func (stubHandler) NotifyPaid(context.Context, *http.Request, map[string]any) Reply {
+func (stubHandler) NotifyPaid(context.Context, *http.Request, BuyPaymentRequest) Reply {
 	return Reply{Code: CodeSuccess, Message: "ok"}
 }
 
@@ -36,7 +36,7 @@ func TestInboundLookupAndBadSign(t *testing.T) {
 	mux := http.NewServeMux()
 	in.Register(mux)
 
-	body := map[string]any{"project_role_id": "player-web-prod"}
+	body := map[string]any{"cp_role_id": "player-web-prod", "cp_server_id": "1"}
 	body["sign"] = SignSortedQSMD5(body, "test-sign-secret")
 	raw, _ := json.Marshal(body)
 	req := httptest.NewRequest(http.MethodPost, PathLookupRole, bytes.NewReader(raw))
@@ -53,7 +53,7 @@ func TestInboundLookupAndBadSign(t *testing.T) {
 		t.Fatalf("env %+v", env)
 	}
 
-	bad, _ := json.Marshal(map[string]any{"project_role_id": "player-web-prod", "sign": "bad"})
+	bad, _ := json.Marshal(map[string]any{"cp_role_id": "player-web-prod", "sign": "bad"})
 	req = httptest.NewRequest(http.MethodPost, PathLookupRole, bytes.NewReader(bad))
 	rec = httptest.NewRecorder()
 	mux.ServeHTTP(rec, req)
@@ -78,8 +78,8 @@ func TestNewInboundNilHandler(t *testing.T) {
 	}
 }
 
-// 雪花 role_id 超过 float64 安全整数（2^53）。JSON number 必须用 UseNumber 验签，不能解成 float64。
-func TestInboundListProductsSnowflakeInt64JSONNumber(t *testing.T) {
+// 验签：雪花 JSON number 必须用 UseNumber；struct 为 string 时 number 进线 → 400。
+func TestInboundSignAcceptsSnowflakeJSONNumberThenTypeError(t *testing.T) {
 	in, err := NewInbound("test-sign-secret", stubHandler{})
 	if err != nil {
 		t.Fatal(err)
@@ -97,14 +97,51 @@ func TestInboundListProductsSnowflakeInt64JSONNumber(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, PathListProducts, bytes.NewReader(raw))
 	rec := httptest.NewRecorder()
 	mux.ServeHTTP(rec, req)
-	if rec.Code != http.StatusOK {
-		t.Fatalf("http %d", rec.Code)
-	}
 	var env map[string]any
-	if err := json.Unmarshal(rec.Body.Bytes(), &env); err != nil {
+	_ = json.Unmarshal(rec.Body.Bytes(), &env)
+	if int(env["code"].(float64)) != 400 {
+		t.Fatalf("want 400 type error got %+v", env)
+	}
+}
+
+func TestInboundListProductsSnowflakeString(t *testing.T) {
+	in, err := NewInbound("test-sign-secret", stubHandler{})
+	if err != nil {
 		t.Fatal(err)
 	}
+	mux := http.NewServeMux()
+	in.Register(mux)
+
+	body := map[string]any{"platform_role_id": "3747523271598286848"}
+	body["sign"] = SignSortedQSMD5(body, "test-sign-secret")
+	raw, _ := json.Marshal(body)
+	req := httptest.NewRequest(http.MethodPost, PathListProducts, bytes.NewReader(raw))
+	rec := httptest.NewRecorder()
+	mux.ServeHTTP(rec, req)
+	var env map[string]any
+	_ = json.Unmarshal(rec.Body.Bytes(), &env)
 	if int(env["code"].(float64)) != 0 {
 		t.Fatalf("want code=0 got %+v", env)
+	}
+}
+
+// V0：缺 product_id 仍进 Handler（stub 成功）。
+func TestInboundCreateOrderMissingProductIDReachesHandler(t *testing.T) {
+	in, err := NewInbound("test-sign-secret", stubHandler{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	mux := http.NewServeMux()
+	in.Register(mux)
+	body := map[string]any{"platform_role_id": "1"}
+	body["sign"] = SignSortedQSMD5(body, "test-sign-secret")
+	raw, _ := json.Marshal(body)
+	req := httptest.NewRequest(http.MethodPost, PathCreateOrder, bytes.NewReader(raw))
+	rec := httptest.NewRecorder()
+	mux.ServeHTTP(rec, req)
+	var env map[string]any
+	_ = json.Unmarshal(rec.Body.Bytes(), &env)
+	if int(env["code"].(float64)) != 0 {
+		t.Fatalf("want 0 (handler) got %+v", env)
 	}
 }
