@@ -232,3 +232,32 @@ type ServerMailRef struct {
 type SendServerReply struct {
 	Refs []ServerMailRef `json:"refs"`
 }
+
+// NATS 新邮推送（snake_case；与 ListMail 的 MailHeader 字段一致）。
+
+// ServerMailNotifyHeader 全服/条件邮 NATS 通知头。
+type ServerMailNotifyHeader struct {
+	ID        core.JSONInt64 `json:"id"`
+	MailRefID string         `json:"mail_ref_id"`
+	ExpireAt  core.JSONInt64 `json:"expire_at"`
+	ExpireCD  core.JSONInt64 `json:"expire_cd"`
+}
+
+// NewPlayerMailNotify 个人/群组邮 NATS 载荷。
+type NewPlayerMailNotify struct {
+	ServerID string       `json:"server_id"`
+	PlayerID string       `json:"player_id"`
+	Headers  []MailHeader `json:"headers"`
+}
+
+// NewServerMailNotify 全服/条件邮 NATS 载荷。
+type NewServerMailNotify struct {
+	ServerID string                   `json:"server_id"`
+	Headers  []ServerMailNotifyHeader `json:"headers"`
+}
+
+// NewMailNotify NATS 推送根类型（player_mail 与 server_mail 二选一非空）。
+type NewMailNotify struct {
+	PlayerMail *NewPlayerMailNotify `json:"player_mail,omitempty"`
+	ServerMail *NewServerMailNotify `json:"server_mail,omitempty"`
+}
