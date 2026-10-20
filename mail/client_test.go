@@ -121,3 +121,22 @@ func TestListDecodesSnakeCase(t *testing.T) {
 		t.Fatalf("%+v", rep)
 	}
 }
+
+func TestReadDecodesProtojsonInt64StringArray(t *testing.T) {
+	t.Parallel()
+	c := testCore(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != pathRead {
+			t.Errorf("path=%s", r.URL.Path)
+		}
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"code":0,"data":{"read_mail_ids":["101","102"],"badge":{"unread_mail_count":0}}}`))
+	})
+	cli, _ := New(c)
+	rep, err := cli.Read(context.Background(), ReadRequest{PlayerID: "p", ServerID: "1", MailIDs: []int64{101}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(rep.ReadMailIDs) != 2 || rep.ReadMailIDs[0] != 101 || rep.ReadMailIDs[1] != 102 {
+		t.Fatalf("read_mail_ids=%v", rep.ReadMailIDs)
+	}
+}

@@ -144,6 +144,8 @@ SDK 负责：验签（`SignSortedQSMD5`）→ JSON Unmarshal → 回调。方法
 
 Go 字段仍是 PascalCase。
 
+邮件响应的 `read_mail_ids`、`removed_mail_ids` 均为 `[]int64`，SDK 内部兼容 JSON 数字和字符串元素，调用方无需转换。空数组与 `null` 保持区分；请求侧 `mail_ids` 仍发 JSON number。
+
 ## 7. 从 v1 迁移
 
 - import 换成 `sdk-go/v3/...`。

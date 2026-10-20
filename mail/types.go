@@ -47,12 +47,12 @@ type MailHeader struct {
 }
 
 type MailDetail struct {
-	ID              core.JSONInt64 `json:"id"`
-	Type            MailType       `json:"type"`
-	From            string         `json:"from"`
-	Title           string         `json:"title"`
-	Content         string         `json:"content"`
-	TemplateID      string         `json:"template_id"`
+	ID         core.JSONInt64 `json:"id"`
+	Type       MailType       `json:"type"`
+	From       string         `json:"from"`
+	Title      string         `json:"title"`
+	Content    string         `json:"content"`
+	TemplateID string         `json:"template_id"`
 	// TemplateArgs platform_template 存证用；plain.* 标量，i18n.* 为 lang→标量 对象且须含 App 默认语言（读信渲染规则同发信）。
 	TemplateArgs    string         `json:"template_args"`
 	Attachment      string         `json:"attachment"`
