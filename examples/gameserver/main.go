@@ -21,7 +21,13 @@ func main() {
 	secret := os.Getenv("SHIMO_AUTH_SECRET")
 	demo := os.Getenv("SHIMO_DEMO")
 	if baseURL == "" || appID == "" || secret == "" || demo == "" {
-		fmt.Fprintln(os.Stderr, "用法: SHIMO_URL SHIMO_APP_ID SHIMO_AUTH_SECRET SHIMO_DEMO=mail|leaderboard|auth|iap|redeem [SHIMO_ORG_ID] [SHIMO_ACCOUNT_ID|SHIMO_PLAYER_ID|SHIMO_TOKEN|SHIMO_ORDER_ID|SHIMO_CODE]")
+		fmt.Fprintln(os.Stderr, `用法: 设置 SHIMO_URL SHIMO_APP_ID SHIMO_AUTH_SECRET SHIMO_DEMO
+基础示例: mail | leaderboard | auth | iap | redeem
+邮件示例: mail-send-v2 | mail-group-v2 | mail-server-v2 | mail-audience-v2
+          mail-platform-template-v2 | mail-client-template-v2 | mail-receive
+可选组织: SHIMO_ORG_ID
+各示例业务参数: SHIMO_PLAYER_ID / SHIMO_TOKEN / SHIMO_ORDER_ID / SHIMO_CODE 等
+邮件参数与配置前置见 docs/mail-v2.md`)
 		os.Exit(2)
 	}
 
@@ -50,10 +56,15 @@ func main() {
 		})
 		must(err)
 		fmt.Printf("mail unread=%d\n", rep.Badge.UnreadMailCount)
+	case "mail-send-v2", "mail-group-v2", "mail-server-v2", "mail-audience-v2",
+		"mail-platform-template-v2", "mail-client-template-v2", "mail-receive":
+		must(mailV2Demo(ctx, c, demo))
 	case "leaderboard":
 		cli, err := leaderboard.New(c)
 		must(err)
-		rep, err := cli.Ask(ctx, leaderboard.AskRequest{ID: envOr("SHIMO_LB_ID", "demo")})
+		rep, err := cli.Ask(ctx, leaderboard.AskRequest{
+			ID: envOr("SHIMO_LB_ID", "demo"),
+		})
 		must(err)
 		fmt.Printf("leaderboard id=%s name=%s\n", rep.ID, rep.Name)
 	case "auth":
@@ -65,7 +76,9 @@ func main() {
 	case "iap":
 		cli, err := iap.New(c)
 		must(err)
-		rep, err := cli.VerifyOrder(ctx, iap.VerifyOrderRequest{OrderID: os.Getenv("SHIMO_ORDER_ID")})
+		rep, err := cli.VerifyOrder(ctx, iap.VerifyOrderRequest{
+			OrderID: os.Getenv("SHIMO_ORDER_ID"),
+		})
 		must(err)
 		fmt.Printf("iap order=%s state=%d success=%v\n", rep.OrderID, rep.State, iap.VerifySuccess(rep.State))
 	case "redeem":

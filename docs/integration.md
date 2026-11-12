@@ -1,120 +1,136 @@
 # sdk-go v3 接入指南
 
-读者：游戏服 Go 服务端。版本 v3.5.0。
+读者：游戏服 Go 服务端。module：`github.com/ShimmerGames-Co-Ltd/sdk-go/v3`。
 
 ## 1. 安装
 
 ```bash
-go get github.com/ShimmerGames-Co-Ltd/sdk-go/v3@v3.5.0
+go get github.com/ShimmerGames-Co-Ltd/sdk-go/v3@latest
 ```
 
-| | v1 | v3 |
+| | 旧 SDK module（v1） | 当前 SDK module（v3） |
 |--|--|--|
 | module | `github.com/ShimmerGames-Co-Ltd/sdk-go` | `github.com/ShimmerGames-Co-Ltd/sdk-go/v3` |
 | import | `.../sdk-go/core` | `.../sdk-go/v3/core` |
-| 分支 | `version-1.1.0` | `main` |
 
-本地未发布 tag 时：
+依赖版本记录在游戏服项目的 `go.mod` / `go.sum` 中。需要使用本地 SDK 源码时，在游戏服项目的 `go.mod` 中添加：
 
 ```
 replace github.com/ShimmerGames-Co-Ltd/sdk-go/v3 => /path/to/sdk-go
 ```
 
-工作树必须在 **main**，且 `go.mod` 第一行是 `module github.com/ShimmerGames-Co-Ltd/sdk-go/v3`。
+将 `/path/to/sdk-go` 替换为源码目录；恢复使用发布版本时移除这行。
 
 ## 2. 创建 Client
 
-`WithURL` 填**网关根**，不要自行再拼 `/auth`。
+`WithURL` 填**网关根地址**，例如 `http://platform-api.shimmer.lab`，不含 `/auth`、`/mail` 等服务路径。以下代码放在返回 `error` 的业务函数中；`ctx` 和配置值由项目提供。
 
 ```go
 c, err := core.NewClient(
-    core.WithURL("http://platform-api.shimmer.lab"),
-    core.WithAppID(appID),
-    core.WithOrganizationID(orgID),
-    core.WithServerSignSecret(serverSignSecret), // Hub app.auth_secret，不是 sdk_secret
+	core.WithURL(os.Getenv("SHIMO_URL")),
+	core.WithAppID(appID),
+	core.WithOrganizationID(orgID),
+	core.WithServerSignSecret(serverSignSecret), // Hub app.auth_secret
 )
+if err != nil {
+	return err
+}
 ```
 
-`WithURL`、`WithAppID`、`WithServerSignSecret` 必填。`WithOrganizationID` 与 `WithHTTPClient` 可选。没有玩家 token、没有可改的版本头、没有 path 前缀或自定义签算 URI。
+`WithURL`、`WithAppID`、`WithServerSignSecret` 必填；`WithOrganizationID` 与 `WithHTTPClient` 可选。签名密钥使用 Hub 的 `app.auth_secret`，不要使用客户端的 `sdk_secret`。
 
-默认带 `X-Server-Version: v3.5.0`，调用方不能改。不要设置 `X-SDK-Version`。密钥只从环境变量或密钥系统读取。
+SDK 自动处理签名和兼容请求头。密钥从环境变量或密钥系统读取。
 
-同一 `*core.Client` 可交给 `auth.New`、`mail.New`、`iap.New`、`leaderboard.New`、`redeemcode.New`。这些 `New` 只拒绝空 Client。
+同一 `*core.Client` 可用于创建各业务 Client，例如 `auth.New(c)`、`mail.New(c)`。
 
-## 3. 新 body 与错误
+## 3. 返回值与错误
 
-服务端成功和业务失败都是 **HTTP 200**：
+先检查调用返回的 `err`；成功时直接使用返回的 Go 对象。SDK 已解析服务端的 `{code,data,message}` 响应：
 
 | 情况 | 判断 |
 |------|------|
-| 成功 | `code==0`，数据在 `data` |
+| 成功 | `err == nil`；服务端 `code==0`，SDK 将 `data` 解析为返回对象 |
 | 业务失败 | `*core.APIError`（`code!=0`） |
-| 网关/传输非 200 | `*core.HTTPError` |
+| HTTP 非 200 | `*core.HTTPError` |
 | 网络失败 | `*core.TransportError` |
-| 200 但不是 `{code,data,message}` | `*core.ResponseBodyError` |
+| HTTP 200，但响应不符合 `{code,data,message}` 格式 | `*core.ResponseBodyError` |
 
-不要把 HTTP 状态码当作唯一成败标准。
+业务失败也可能返回 HTTP 200，不能只凭 HTTP 状态码判断成功。需要区分错误类型时使用 `errors.As`。
 
-## 4. 路径与 Kong
+## 4. 请求路径
 
-SDK 路径已经包含网关服务前缀。Kong `strip_path` 之后，服务用 `X-Original-URI` 验签，因此签的是带前缀的 URI。
+SDK 自动拼接以下完整路径，调用方只需配置根地址。
 
 | 包 | 示例 path |
 |----|-----------|
 | auth | `/auth/v1/server/verify` |
-| mail | `/mail/v1/mail/server/login` |
+| mail | `/mail/v1/mail/server/login`、`/mail/v2/mail/server/send/player` |
 | iap | `/iap/v1/server/verify_order` |
 | leaderboard | `/leaderboard/v1/server/register` |
 | redeemcode | `/redeemcode/v1/server/codes:check` |
 
-`/mail/v1/mail/...` 是预期形态：前缀 `/mail`，服务自己的路径仍是 `/v1/mail/...`。
-
-直连上游时 `WithURL` 仍填该进程根地址，path 与经 Kong 时相同。SDK 不再提供改签算 URI 或额外前缀。不要由调用方设置 `X-Original-URI`。
+`/mail/v1/mail/...` 中的两个 `mail` 都需要保留。路径与验签由 SDK 处理，无需自行设置 `X-Original-URI`。
 
 `officialweb` 挂在**游戏服**上，路径是 `/payment/*`，不走上表前缀。
 
-## 5. 按包
+## 5. 各包用法
 
 ### auth
 
 ```go
-cli, _ := auth.New(c)
-rep, err := cli.Verify(ctx, userToken)
+cli, err := auth.New(c)
+if err != nil {
+	return err
+}
+reply, err := cli.Verify(ctx, userToken)
+if err != nil {
+	return err
+}
+fmt.Println(reply.RoleID)
+return nil
 ```
 
-`Verify` 的 body 另有 HMAC-SHA1（`appid`/`token`/`ts`），密钥与 Authorization 相同，算法不同。
+`c` 为第 2 节创建的 Client；`reply` 为解析后的验证结果。
 
 ### mail
 
-请求 JSON 为 snake_case。`content_mode=platform_template` 时，`template_id` 填 Admin 模板 `code`，`title`/`content` 留空；`template_args` 是 **JSON object 的字符串**（整段当作一个 string 字段提交，不是请求体里的嵌套 object）。
+#### V2：新接入使用
 
-键名须与模板正文 `{{key}}` 完全一致（含 `plain.` / `i18n.` 前缀），且须在该 App 的模板参数目录中已启用：
+使用 `SendPlayerV2`、`SendGroupV2`、`SendServerV2`。V2 指邮件发送接口版本，仍使用 `sdk-go/v3` module；服务端须支持 V2 接口。
 
-| 前缀 | `template_args` 中的值 | 说明 |
-|------|------------------------|------|
-| `plain.` | JSON 标量（string / number / bool） | 各语言共用同一值 |
-| `i18n.` | JSON object | 键为语言码（与模板 `i18n[].lang`、Login 的 `lang` 同一套，如 `ChineseSimplified`、`English`）；**必须**含 Hub 配置的 App 默认语言；每种语言的值为标量 |
+[参数表、必填性与默认值](mail-v2.md) · [V1 迁移对照](mail-v2.md#7-邮件发送-v1-到-v2-迁移) · [完整迁移示例](mail-v1-to-v2.md)。
 
-Mail 按玩家 Login 时的 `lang` 解析 `i18n.*`；缺该语言时回退 App 默认语言。只允许模板占位符集合内的键，不可多传；整段 JSON 字符串 ≤ 8192 bytes。
+读取邮箱继续使用 `Login`、`Sync`、`List`、`Get` 等方法。游戏服读写玩家邮箱时，后台须将 App 的 `runtime_access` 配置为 `via_game_server`；发送邮件不受此配置限制。使用 `client_direct` 的项目由客户端 SDK 读取邮箱。
 
-仅标量参数：
+#### V1：已有接入仍可使用
+
+`SendPlayer`、`SendGroup`、`SendServer` 的原用法保留。平台模板模式下，`TemplateID` 填后台模板的 `code`，`Title`、`Content` 留空。
+
+V1 的 `TemplateArgs` 是 **包含 JSON 对象的字符串**，键名与模板中的 `{{key}}` 一致：
+
+- `plain.*` 的值为字符串、数字或布尔值，各语言共用。
+- `i18n.*` 的值为“语言标识 → 值”的对象，必须含 App 默认语言；每种语言的值也是字符串、数字或布尔值。
+
+示例：后台已启用 `welcome` 模板，恰好使用 `{{plain.player_name}}` 和 `{{i18n.item_name}}`，App 默认语言为 `English`。
 
 ```go
-cli, _ := mail.New(c)
+cli, err := mail.New(c)
+if err != nil {
+	return err
+}
 _, err = cli.SendPlayer(ctx, mail.SendPlayerRequest{
-    ServerID: "1", To: "player-1", Serial: "s1", From: "sys",
-    ContentMode: mail.ContentModePlatformTemplate,
-    TemplateID: "welcome", TemplateArgs: `{"plain.player_name":"a"}`,
+	From:         "system",
+	Serial:       "welcome-role-10001",
+	ServerID:     "1",
+	To:           "10001",
+	ContentMode:  mail.ContentModePlatformTemplate,
+	TemplateID:   "welcome",
+	TemplateArgs: `{"plain.player_name":"Ada","i18n.item_name":{"English":"Legendary Sword"}}`,
 })
+return err
 ```
 
-标量 + 多语言参数混用（`SendGroup` / `SendServer` 的 `template_args` 规则相同）：
-
-```go
-TemplateArgs: `{"plain.player_name":"Ada","i18n.item_name":{"ChineseSimplified":"传说之剑","English":"Legendary Sword"}}`,
-```
-
-路径：`/mail/v1/mail/server/login|sync|list|get|read|claim|remove` 与 `send/player|group|server`。不要调用旧的 `/mail/send/*`。
+参数须与模板要求的键完全一致，不能缺传或多传，JSON 字符串最多 8192 字节。`i18n.*` 按玩家登录语言取值，缺少该语言时使用 App 默认语言。
 
 ### iap
 
@@ -122,7 +138,7 @@ TemplateArgs: `{"plain.player_name":"Ada","i18n.item_name":{"ChineseSimplified":
 
 ### leaderboard
 
-JSON 键与 proto 字段名一致（如 `subId`、`startAt`），不是 snake_case。可 `Register` 后 `SetScore` / `GetScore` 自举一条榜。
+JSON 键使用 camelCase（如 `subId`、`startAt`）。先用 `Register` 创建榜单，再用 `SetScore` / `GetScore` 写入和查询分数。
 
 ### redeemcode
 
@@ -130,9 +146,14 @@ JSON 键与 proto 字段名一致（如 `subId`、`startAt`），不是 snake_ca
 
 ### officialweb
 
-游戏服实现 `PaymentHandler`（五方法入参为 typed Request struct），`Inbound.Register` 挂上 `/payment/lookup_role`、`get_goods_list`、`pre_check`、`add_order`、`buypayment` 与 `/healthz`。
+游戏服实现 `PaymentHandler` 的五个回调，再用 `Inbound.Register` 注册 `/payment/*` 和 `/healthz`。
 
-SDK 负责：验签（`SignSortedQSMD5`）→ JSON Unmarshal → 回调。方法错误、非法 JSON、字段**类型**不符 → `code=400`；验签失败 → `401`。不做必填非空校验；缺字段为零值，由业务处理。`platform_role_id` 等为 **string**（与契约一致；Auth `Verify` 的 `role_id` 为 `JSONInt64`，项目方自行 Format 后写入查角响应）。`AddOrderRequest.ProductNameI18n` 为线格式 JSON 字符串；有值时参与验签，宿主宜落库供付后邮件包装为 `{"i18n.product_name": <对象>}`。`buypayment` 不携带该字段。字段与错误码真源：中台 `game-inbound.md`。
+SDK 负责验签、解析 JSON，再调用对应回调。业务接口返回 HTTP 200，错误看响应的 `code`：方法错误、非法 JSON 或字段类型不符为 `400`；验签失败为 `401`。字段是否必填、是否为空由游戏服业务校验。
+
+- `PlatformRoleID` 是字符串；从 Auth 的 `VerifyReply.RoleID` 转换时使用 `strconv.FormatInt(int64(reply.RoleID), 10)`。
+- `AddOrderRequest.ProductNameI18n` 是 JSON 字符串，例如 `{"English":"Pack"}`；有值时参与验签。需要用于付后邮件时保存此值，发送 V2 邮件时先解码为对象，再填入 `TemplateArgs["i18n.product_name"]`。支付通知 `BuyPaymentRequest` 不含此字段。
+
+完整字段见[回调请求类型](../officialweb/request.go)，回调定义见[入站接口](../officialweb/inbound.go)。
 
 ## 6. JSON
 
@@ -142,17 +163,19 @@ SDK 负责：验签（`SignSortedQSMD5`）→ JSON Unmarshal → 回调。方法
 | Leaderboard | proto 原名（camelCase） |
 | 错误 | `code`、`message` |
 
-Go 字段仍是 PascalCase。
+文档参数表和 Go 示例使用 SDK 的 Go 字段名，JSON 键名由 SDK 转换。
 
-邮件响应的 `read_mail_ids`、`removed_mail_ids` 均为 `[]int64`，SDK 内部兼容 JSON 数字和字符串元素，调用方无需转换。空数组与 `null` 保持区分；请求侧 `mail_ids` 仍发 JSON number。
+邮件响应的 `ReadReply.ReadMailIDs`、`RemoveReply.RemovedMailIDs` 均为 `[]int64`。SDK 自动兼容服务端返回的数字和数字字符串，无需调用方转换；空数组与 `null` 保持区分。请求中的 `MailIDs` 仍编码为 JSON 数字数组。
 
-## 7. 从 v1 迁移
+## 7. 旧 SDK module 迁移
 
-- import 换成 `sdk-go/v3/...`。
+本节指旧 SDK module 到 `sdk-go/v3` 的迁移。同一个 `sdk-go/v3/mail` 包内的邮件发送 V1 到 V2，请看[邮件迁移说明](mail-v2.md#7-邮件发送-v1-到-v2-迁移)。
+
+- import 换成 `github.com/ShimmerGames-Co-Ltd/sdk-go/v3/...`。
 - 不再使用 `APIResult` / `PlatError`；用 `errors.As` 区分 `APIError` 与 `HTTPError`。
-- 版本头改为默认 `v3.5.0`（不要再发 `v1.0.0`）。
-- 路径改为第 4 节，不要继续拼 `/mail/send/player`。
-- 成功体从扁平 JSON 改为只读 `data`。
+- 签名及兼容请求头交由 SDK 处理，移除接入方自行设置或覆盖版本头的逻辑。
+- 使用 SDK 方法发请求，无需手工拼路径。
+- 使用方法返回的 Go 对象，SDK 自动从响应的 `data` 中解析。
 
 ## 8. 密钥
 
@@ -160,10 +183,14 @@ Go 字段仍是 PascalCase。
 
 ## 9. 联调
 
-中台夹具 mockgame 提供 UAT smoke（auth、mail、排行榜自举、固定订单验单、兑换码 Check）。环境变量模板见夹具 `configs/sdk_v3_smoke.env.example`。真实值放本地 gitignore 文件。
+SDK 自带[调用示例](../examples/gameserver/main.go)。先设置 `SHIMO_URL`、`SHIMO_APP_ID`、`SHIMO_AUTH_SECRET`，再选择场景运行，例如：
 
-夹具可以同时链 v1 与 v3，出站用配置切换；默认 v3。官充入站只有 v3。
+```bash
+SHIMO_DEMO=auth SHIMO_TOKEN='<user-token>' go run ./examples/gameserver
+```
 
-## 10. 非目标
+邮件示例的场景和所需环境变量见[邮件 V2 调用示例](mail-v2.md#6-调用示例)。
 
-无 chat、无 realtime、无 Admin、无玩家邮件 JWT 面、无 IAP 用户创单。
+## 10. 支持范围
+
+SDK 面向游戏服，不包含 chat、realtime、Admin、客户端邮件接口或玩家侧 IAP 创单接口。
