@@ -100,6 +100,8 @@ return nil
 
 [参数表、必填性与默认值](mail-v2.md) · [V1 迁移对照](mail-v2.md#7-邮件发送-v1-到-v2-迁移) · [完整迁移示例](mail-v1-to-v2.md)。
 
+新邮 HTTP 回调使用 `NewHTTPNotifyHandler` 或 `ParseHTTPNotify`，公开类型与既有通知载荷集中在 `mail/types.go`。每次通知是一封邮件事件，接入说明见[新邮通知](mail-notify.md)。
+
 读取邮箱继续使用 `Login`、`Sync`、`List`、`Get` 等方法。游戏服读写玩家邮箱时，后台须将 App 的 `runtime_access` 配置为 `via_game_server`；发送邮件不受此配置限制。使用 `client_direct` 的项目由客户端 SDK 读取邮箱。
 
 #### V1：已有接入仍可使用

@@ -52,3 +52,5 @@ return err
 不含 chat、realtime、Admin。
 
 邮件新接入使用 `SendPlayerV2`、`SendGroupV2`、`SendServerV2`；现有 V1 发送方法继续可用。服务端需支持 V2 接口。字段、默认值和示例见[邮件 V2 接入](docs/mail-v2.md)。
+
+接收新邮 HTTP 回调使用 `mail.NewHTTPNotifyHandler`；已有路由可调用 `mail.ParseHTTPNotify`。SDK 负责验签和单封事件解析，项目负责处理或入队。见[新邮通知接入](docs/mail-notify.md)。

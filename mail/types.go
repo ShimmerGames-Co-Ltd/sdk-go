@@ -1,6 +1,11 @@
 package mail
 
-import "github.com/ShimmerGames-Co-Ltd/sdk-go/v3/core"
+import (
+	"context"
+	"net/http"
+
+	"github.com/ShimmerGames-Co-Ltd/sdk-go/v3/core"
+)
 
 // 请求与响应 data 均为 snake_case（sdk-go v3）；服务端入站仍可接受旧 camelCase。
 
@@ -281,9 +286,9 @@ type SendServerReply struct {
 	Refs []ServerMailRef `json:"refs"`
 }
 
-// NATS 新邮推送（snake_case；与 ListMail 的 MailHeader 字段一致）。
+// 新邮通知（NATS/HTTP 共用 snake_case 载荷）。
 
-// ServerMailNotifyHeader 全服/条件邮 NATS 通知头。
+// ServerMailNotifyHeader 是区服邮件通知头；ID 是服邮箱游标，不是玩家邮箱内 ID。
 type ServerMailNotifyHeader struct {
 	ID        core.JSONInt64 `json:"id"`
 	MailRefID string         `json:"mail_ref_id"`
@@ -291,21 +296,45 @@ type ServerMailNotifyHeader struct {
 	ExpireCD  core.JSONInt64 `json:"expire_cd"`
 }
 
-// NewPlayerMailNotify 个人/群组邮 NATS 载荷。
+// NewPlayerMailNotify 是发给一个玩家的个人/群组邮件通知，NATS/HTTP 共用。
 type NewPlayerMailNotify struct {
-	ServerID string       `json:"server_id"`
-	PlayerID string       `json:"player_id"`
-	Headers  []MailHeader `json:"headers"`
+	ServerID string `json:"server_id"`
+	PlayerID string `json:"player_id"`
+	// Headers 保留既有数组格式；当前每个发送事件只通知一封邮件，HTTP 入站要求恰好一项。
+	Headers []MailHeader `json:"headers"`
 }
 
-// NewServerMailNotify 全服/条件邮 NATS 载荷。
+// NewServerMailNotify 是发给一个区服的邮件通知，NATS/HTTP 共用；玩家收取仍需 Sync。
 type NewServerMailNotify struct {
-	ServerID string                   `json:"server_id"`
-	Headers  []ServerMailNotifyHeader `json:"headers"`
+	ServerID string `json:"server_id"`
+	// Headers 保留既有数组格式；当前每个发送事件只通知一封邮件，HTTP 入站要求恰好一项。
+	Headers []ServerMailNotifyHeader `json:"headers"`
 }
 
-// NewMailNotify NATS 推送根类型（player_mail 与 server_mail 二选一非空）。
+// NewMailNotify 是新邮通知载荷；PlayerMail 与 ServerMail 仅一个非空。
 type NewMailNotify struct {
 	PlayerMail *NewPlayerMailNotify `json:"player_mail,omitempty"`
 	ServerMail *NewServerMailNotify `json:"server_mail,omitempty"`
 }
+
+// HTTPNotifyRequest 是已验签的单封新邮事件，复用 NewMailNotify 的载荷。
+// PlayerMail 或 ServerMail 的 Headers 恰好一项；AppID 与 RawBody 不参与 JSON 序列化。
+type HTTPNotifyRequest struct {
+	NewMailNotify
+	// AppID 来自已验证的 X-App-ID 请求头。
+	AppID string `json:"-"`
+	// RawBody 是用于验签的原始 JSON，SDK 已独立读取；可用于项目必要留痕。
+	RawBody []byte `json:"-"`
+}
+
+// HTTPNotifyError 表示通知接入协议错误；不同于调用中台接口时的 core.APIError。
+type HTTPNotifyError struct {
+	// StatusCode 是接收端应返回的 HTTP 状态；可通过 WriteHTTPNotifyError 统一响应。
+	StatusCode int
+	// Message 是可返回给发送端的协议错误说明。
+	Message string
+}
+
+// HTTPNotifyHandlerFunc 处理已经验签、解码的单封通知。
+// 返回 nil 后 SDK 响应 204；处理或入队失败返回错误，不提前确认通知。
+type HTTPNotifyHandlerFunc func(context.Context, *http.Request, HTTPNotifyRequest) error
